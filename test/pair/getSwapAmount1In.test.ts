@@ -57,12 +57,12 @@ describe('IntegralPair.getSwapAmount1In', () => {
     await pair.swap(outputAmount, 0, wallet.address, overrides)
 
     const outputAmount2 = expandTo18Decimals(1)
-    const expectedInputAmount2 = expandTo18Decimals('380.692522653122271562')
+    const expectedInputAmount2 = expandTo18Decimals('380.692522653123209209')
 
     expect(await pair.getSwapAmount1In(outputAmount2)).to.eq(expectedInputAmount2)
 
     const after = await getState()
-    expect(after.reserves[0]).to.eq(expandTo18Decimals('98.999999990000006338'))
+    expect(after.reserves[0]).to.eq(expandTo18Decimals('98.999999990000003875'))
     expect(after.reserves[1]).to.eq(expandTo18Decimals('2516.550150892053632480'))
     expect(after.references[0]).to.eq(expandTo18Decimals(100))
     expect(after.references[1]).to.eq(expandTo18Decimals(2137))

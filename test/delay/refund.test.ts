@@ -51,7 +51,7 @@ describe('IntegralDelay.refund', () => {
       amount1: expandTo18Decimals(1),
     })
 
-    await token0.setRevertTransfer(true)
+    await token0.setRevertAfter(await token0.totalTransfers())
     const tx = await delay.execute(1, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))

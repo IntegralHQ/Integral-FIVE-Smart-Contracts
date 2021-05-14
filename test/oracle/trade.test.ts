@@ -29,10 +29,10 @@ describe('IntegralOracle.trade', () => {
     }
 
     expect(await tradeX(100, 100, 2137)).to.eq(toDecimals('2137', yDecimals))
-    expect(await tradeX(99, 100, 2000)).to.eq(toDecimals('2379.550147096552161515', yDecimals))
+    expect(await tradeX(99, 100, 2000)).to.eq(toDecimals('2379.55014709655216151500', yDecimals))
     expect(await tradeX(101, 100, 2000)).to.eq(toDecimals('1620.45012816687417057300', yDecimals))
-    expect(await tradeX(50, 100, 1000000)).to.eq(toDecimals('1018977.86774138040378855000', yDecimals))
-    expect(await tradeX(150, 100, 1000000)).to.eq(toDecimals('981022.82041718542643055000', yDecimals))
+    expect(await tradeX(50, 100, 1000000)).to.eq(toDecimals('1018977.86774138040378852600', yDecimals))
+    expect(await tradeX(150, 100, 1000000)).to.eq(toDecimals('981022.82041718542643052500', yDecimals))
   }
 
   async function testTradeY(oracle: IntegralOracle, xDecimals: number, yDecimals: number) {
@@ -48,10 +48,10 @@ describe('IntegralOracle.trade', () => {
     }
 
     expect(await tradeY(100, 2137, 100)).to.eq(toDecimals('2137', xDecimals))
-    expect(await tradeY(99, 2000, 100)).to.eq(toDecimals('2000.00263469898798572200', xDecimals))
-    expect(await tradeY(101, 2000, 100)).to.eq(toDecimals('1999.99736530101705269500', xDecimals))
-    expect(await tradeY(50, 1000000, 100)).to.eq(toDecimals('1000000.13173495514219748800', xDecimals))
-    expect(await tradeY(150, 1000000, 100)).to.eq(toDecimals('999999.86826505744362535000', xDecimals))
+    expect(await tradeY(99, 2000, 100)).to.eq(toDecimals('2000.00263469898798495000', xDecimals))
+    expect(await tradeY(101, 2000, 100)).to.eq(toDecimals('1999.99736530101704937700', xDecimals))
+    expect(await tradeY(50, 1000000, 100)).to.eq(toDecimals('1000000.13173495514219614400', xDecimals))
+    expect(await tradeY(150, 1000000, 100)).to.eq(toDecimals('999999.86826505744362416900', xDecimals))
   }
 
   it('returns correct values for trades for standard tokens', async () => {

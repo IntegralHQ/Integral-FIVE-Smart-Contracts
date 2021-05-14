@@ -29,8 +29,6 @@ interface IIntegralDelay {
 
     function botExecuteTime() external returns (uint256);
 
-    function tradeMoe() external returns (uint256);
-
     function gasPriceInertia() external returns (uint256);
 
     function gasPrice() external returns (uint256);
@@ -84,8 +82,6 @@ interface IIntegralDelay {
     function setMaxGasPriceImpact(uint256 _maxGasPriceImpact) external;
 
     function setTransferGasCost(address token, uint256 gasCost) external;
-
-    function setTradeMoe(uint256 _tradeMoe) external;
 
     function deposit(Orders.DepositParams memory depositParams) external payable returns (uint256 orderId);
 

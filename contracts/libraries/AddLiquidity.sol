@@ -6,7 +6,9 @@ pragma solidity 0.7.5;
 import './TransferHelper.sol';
 import './SafeMath.sol';
 import './Math.sol';
+import './Normalizer.sol';
 import '../interfaces/IIntegralPair.sol';
+import '../interfaces/IIntegralOracle.sol';
 
 library AddLiquidity {
     using SafeMath for uint256;
@@ -55,7 +57,7 @@ library AddLiquidity {
         if (amount1Left == 0) {
             return (amount0, amount1Left);
         }
-        uint256 price = amount1Left.mul(1e18).div(amount0In);
+        uint256 price = getPrice(amount0In, amount1Left, pair);
         require(minSwapPrice == 0 || price >= minSwapPrice, 'AL_PRICE_TOO_LOW');
         TransferHelper.safeTransfer(token0, pair, amount0In);
         IIntegralPair(pair).swap(0, amount1Left, address(this));
@@ -73,11 +75,22 @@ library AddLiquidity {
         if (amount0Left == 0) {
             return (amount0Left, amount1);
         }
-        uint256 price = amount1In.mul(1e18).div(amount0Left);
+        uint256 price = getPrice(amount0Left, amount1In, pair);
         require(maxSwapPrice == 0 || price <= maxSwapPrice, 'AL_PRICE_TOO_HIGH');
         TransferHelper.safeTransfer(token1, pair, amount1In);
         IIntegralPair(pair).swap(amount0Left, 0, address(this));
         amount1Left = amount1.sub(amount1In);
+    }
+
+    function getPrice(
+        uint256 amount0,
+        uint256 amount1,
+        address pair
+    ) internal view returns (uint256) {
+        IIntegralOracle oracle = IIntegralOracle(IIntegralPair(pair).oracle());
+        uint8 xDecimals = oracle.xDecimals();
+        uint8 yDecimals = oracle.yDecimals();
+        return Normalizer.normalize(amount1, yDecimals).mul(1e18).div(Normalizer.normalize(amount0, xDecimals));
     }
 
     function canSwap(

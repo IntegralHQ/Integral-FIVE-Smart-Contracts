@@ -11,6 +11,7 @@ import '@uniswap/v2-periphery/contracts/libraries/UniswapV2OracleLibrary.sol';
 
 contract IntegralOracle is IIntegralOracle {
     using FixedSafeMath for int256;
+    using SafeMath for int256;
     using SafeMath for uint256;
     using Normalizer for uint256;
 
@@ -20,9 +21,8 @@ contract IntegralOracle is IIntegralOracle {
     int256 public override price;
     uint32 public override epoch;
 
-    int256 private constant _POINT_FIVE = 5 * 10**17;
+    int256 private constant _ONE = 10**18;
     int256 private constant _TWO = 2 * 10**18;
-    int256 private constant _FOUR = 4 * 10**18;
 
     uint8 public override xDecimals;
     uint8 public override yDecimals;
@@ -204,19 +204,17 @@ contract IntegralOracle is IIntegralOracle {
 
             // the quantity q falls between the range (pPrevious, pCurrent)
             if (q <= qCurrent) {
-                // We've fitted a linear function y = ax + b between the points (pPrevious, qPrevious) and (pCurrent, qCurrent)
-                // We use this equation to find the price, p, that corresponds to q
-                int256 z = q.sub(qCurrent);
-                int256 x = (pCurrent.sub(pPrevious)).f18Mul(z).f18Div(qCurrent.sub(qPrevious));
-
-                int256 p = x.add(pCurrent);
-                // evaluate integral from pPrevious to p
-                int256 A = _POINT_FIVE.f18Mul(pPrevious.add(p)).f18Mul(q.sub(qPrevious));
+                int256 X = pPrevious.add(pCurrent).mul(qCurrent.sub(qPrevious)).add(
+                    pCurrent.sub(pPrevious).mul(q.sub(qCurrent))
+                );
+                int256 Y = q.sub(qPrevious);
+                int256 Z = qCurrent.sub(qPrevious);
+                int256 A = X.mul(Y).div(Z).div(_TWO);
                 return C.add(A);
             } else {
                 // the quantity q exceeds the current range (pPrevious, pCurrent)
                 // evaluate integral of entire segment
-                int256 A = _POINT_FIVE.f18Mul(pPrevious.add(pCurrent)).f18Mul(qCurrent.sub(qPrevious));
+                int256 A = pPrevious.add(pCurrent).f18Mul(qCurrent.sub(qPrevious)).div(2);
                 C = C.add(A);
             }
         }
@@ -237,13 +235,15 @@ contract IntegralOracle is IIntegralOracle {
             int256 qCurrent = askQs[i];
 
             if (q >= qCurrent) {
-                int256 p = (pCurrent.sub(pPrevious)).f18Mul(q.sub(qCurrent)).f18Div(qCurrent.sub(qPrevious)).add(
-                    pCurrent
+                int256 X = pPrevious.add(pCurrent).mul(qCurrent.sub(qPrevious)).add(
+                    pCurrent.sub(pPrevious).mul(q.sub(qCurrent))
                 );
-                int256 A = _POINT_FIVE.f18Mul(pPrevious.add(p)).f18Mul(q.sub(qPrevious));
+                int256 Y = q.sub(qPrevious);
+                int256 Z = qCurrent.sub(qPrevious);
+                int256 A = X.mul(Y).div(Z).div(_TWO);
                 return C.add(A);
             } else {
-                int256 A = _POINT_FIVE.f18Mul(pPrevious.add(pCurrent)).f18Mul(qCurrent.sub(qPrevious));
+                int256 A = pPrevious.add(pCurrent).f18Mul(qCurrent.sub(qPrevious)).div(2);
                 C = C.add(A);
             }
         }
@@ -261,21 +261,20 @@ contract IntegralOracle is IIntegralOracle {
     }
 
     function integralBidInverted(int256 s) private view returns (int256) {
+        int256 _s = s.add(1);
         int256 C = 0;
         for (uint256 i = 1; i < bidExponents.length; i++) {
             int256 pPrevious = price.f18Mul(bidExponents[i - 1]);
             int256 pCurrent = price.f18Mul(bidExponents[i]);
             int256 qPrevious = bidQs[i - 1];
             int256 qCurrent = bidQs[i];
-            int256 A = _POINT_FIVE.f18Mul(pPrevious.add(pCurrent)).f18Mul(qCurrent.sub(qPrevious));
-            if (s <= C.add(A)) {
-                int256 c = C.sub(s);
+            int256 A = pPrevious.add(pCurrent).f18Mul(qCurrent.sub(qPrevious)).div(2);
+            if (_s <= C.add(A)) {
+                int256 c = C.sub(_s);
                 int256 b = pPrevious;
                 int256 a = pCurrent.sub(b);
                 int256 d = qCurrent.sub(qPrevious);
-                int256 insideSqrt = b.f18Mul(b).sub(_TWO.f18Mul(a).f18Mul(c).f18Div(d));
-                int256 sqrt = insideSqrt.f18Sqrt();
-                int256 h = (sqrt.sub(b)).f18Mul(d).f18Div(a);
+                int256 h = f18SolveQuadratic(a, b, c, d);
                 return qPrevious.add(h);
             } else {
                 C = C.add(A);
@@ -291,17 +290,42 @@ contract IntegralOracle is IIntegralOracle {
             int256 pCurrent = price.f18Mul(askExponents[i]);
             int256 qPrevious = askQs[i - 1];
             int256 qCurrent = askQs[i];
-            int256 A = _POINT_FIVE.f18Mul(pPrevious.add(pCurrent)).f18Mul(qCurrent.sub(qPrevious));
+            int256 A = pPrevious.add(pCurrent).f18Mul(qCurrent.sub(qPrevious)).div(2);
             if (s >= C.add(A)) {
                 int256 a = pCurrent.sub(pPrevious);
                 int256 d = qCurrent.sub(qPrevious);
                 int256 b = pPrevious;
                 int256 c = C.sub(s);
-                int256 inside = b.f18Mul(b).sub(c.f18Mul(_TWO).f18Mul(a).f18Div(d));
-                int256 h = inside.f18Sqrt().sub(b).f18Mul(d).f18Div(a);
-                return qPrevious.add(h);
+                int256 h = f18SolveQuadratic(a, b, c, d);
+                return qPrevious.add(h).sub(1);
             } else {
                 C = C.add(A);
+            }
+        }
+        revert('IO_OVERFLOW');
+    }
+
+    function f18SolveQuadratic(
+        int256 A,
+        int256 B,
+        int256 C,
+        int256 D
+    ) private pure returns (int256) {
+        int256 inside = B.mul(B).sub(_TWO.mul(A).mul(C).div(D));
+        int256 sqroot = int256(Math.sqrt(uint256(inside)));
+        int256 x = sqroot.sub(B).mul(D).div(A);
+        for (uint256 i = 0; i < 16; i++) {
+            int256 xPrev = x;
+            int256 z = A.mul(x);
+            x = z.mul(x).div(2).sub(C.mul(D).mul(_ONE)).div(z.add(B.mul(D)));
+            if (x > xPrev) {
+                if (x.sub(xPrev) <= int256(1)) {
+                    return x;
+                }
+            } else {
+                if (xPrev.sub(x) <= int256(1)) {
+                    return x;
+                }
             }
         }
         revert('IO_OVERFLOW');

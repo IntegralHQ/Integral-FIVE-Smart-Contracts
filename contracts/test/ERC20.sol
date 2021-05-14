@@ -2,9 +2,9 @@
 
 pragma solidity 0.7.5;
 
-import '../IntegralERC20.sol';
+import '../IntegralLPToken.sol';
 
-contract ERC20 is IntegralERC20 {
+contract ERC20 is IntegralLPToken {
     constructor(uint256 _totalSupply) {
         _mint(msg.sender, _totalSupply);
     }

@@ -393,11 +393,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(reserve0, reserve1)
 
-    const amountIn = await buyHelper.getSwapAmount1In(
-      BigNumber.from('100001').mul(BigNumber.from(10).pow(13)).toString(),
-      pair.address,
-      amount0Out
-    )
+    const amountIn = await buyHelper.getSwapAmount1In(pair.address, amount0Out)
     await token1.transfer(pair.address, amountIn)
     await expect(pair.connect(other).swap(amount0Out, amount1Out, wallet.address, overrides))
       .to.emit(pair, 'Swap')

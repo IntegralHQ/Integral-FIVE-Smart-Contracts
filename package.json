@@ -10,13 +10,21 @@
   "scripts": {
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write && yarn lint:eslint --fix",
-    "lint:eslint": "eslint './{test}/**/*.ts'",
-    "lint:prettier": "yarn prettier './{test,contract}/**/*.{ts,sol}'",
+    "lint:eslint": "eslint './{test,playground,deploy,scripts}/**/*.ts'",
+    "lint:prettier": "yarn prettier './{test,contracts,deploy,playground,scripts}/**/*.{ts,sol}'",
     "clean": "rimraf ./build/",
     "prebuild": "yarn clean",
     "build": "waffle .waffle.json && typechain --target ethers-v5 --outDir build/types 'build/*.json'",
     "test": "mocha",
-    "prepublishOnly": "yarn build && yarn test"
+    "deploy": "ts-node deploy/index.ts",
+    "prepublishOnly": "yarn build && yarn test",
+    "start": "ts-node playground/deploy.ts",
+    "execute": "ts-node scripts/bot/executeSingle.ts",
+    "monitor": "ts-node scripts/bot/monitor.ts",
+    "bot": "ts-node scripts/bot/run.ts",
+    "enable": "ts-node scripts/disables/enable.ts",
+    "disable": "ts-node scripts/disables/disable.ts",
+    "set-owner": "ts-node scripts/owner/index.ts"
   },
   "devDependencies": {
     "@resolver-engine/imports-fs": "^0.3.3",

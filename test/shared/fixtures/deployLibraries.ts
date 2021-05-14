@@ -1,10 +1,13 @@
+import { deployContract } from 'ethereum-waffle'
 import { Wallet, ContractFactory } from 'ethers'
 import TokenShares from '../../../build/TokenShares.json'
 import { Orders__factory } from '../../../build/types'
 import { AddLiquidity__factory } from '../../../build/types/factories/AddLiquidity__factory'
 import { BuyHelper__factory } from '../../../build/types/factories/BuyHelper__factory'
+import WithdrawHelper from '../../../build/WithdrawHelper.json'
 
 export async function deployLibraries(wallet: Wallet) {
+  const withdrawHelper = await deployContract(wallet, WithdrawHelper, [])
   const addLiquidity = await new AddLiquidity__factory(wallet).deploy()
   const tokenShares = await new ContractFactory(TokenShares.abi, TokenShares.bytecode, wallet).deploy()
   const orders = await new Orders__factory(
@@ -18,6 +21,7 @@ export async function deployLibraries(wallet: Wallet) {
       'contracts/libraries/Orders.sol:Orders': orders.address,
       'contracts/libraries/AddLiquidity.sol:AddLiquidity': addLiquidity.address,
       'contracts/libraries/BuyHelper.sol:BuyHelper': buyHelper.address,
+      'contracts/libraries/WithdrawHelper.sol:WithdrawHelper': withdrawHelper.address,
     },
     orders,
     tokenShares,

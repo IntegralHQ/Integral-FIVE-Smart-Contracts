@@ -5,12 +5,12 @@ import { ecsign } from 'ethereumjs-util'
 import { expandTo18Decimals, getApprovalDigest, overrides } from './shared/utilities'
 import { setupFixtureLoader } from './shared/setup'
 
-import { ERC20__factory, IntegralERC20 } from '../build/types'
+import { ERC20__factory, IntegralLPToken } from '../build/types'
 
 const TOTAL_SUPPLY = expandTo18Decimals(10000)
 const TEST_AMOUNT = expandTo18Decimals(10)
 
-describe('IntegralERC20', () => {
+describe('IntegralLPToken', () => {
   const loadFixture = setupFixtureLoader()
 
   async function fixture([wallet]: Wallet[]) {
@@ -18,7 +18,7 @@ describe('IntegralERC20', () => {
     return { token }
   }
 
-  let token: IntegralERC20
+  let token: IntegralLPToken
   let wallet: Wallet
   let other: Wallet
   beforeEach(async () => {

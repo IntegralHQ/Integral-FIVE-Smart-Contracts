@@ -14,6 +14,7 @@ import './libraries/Orders.sol';
 import './libraries/TokenShares.sol';
 import './libraries/AddLiquidity.sol';
 import './libraries/BuyHelper.sol';
+import './libraries/WithdrawHelper.sol';
 
 contract IntegralDelay is IIntegralDelay {
     using SafeMath for uint256;
@@ -29,7 +30,6 @@ contract IntegralDelay is IIntegralDelay {
     address public override owner;
     mapping(address => bool) public override isBot;
     uint256 public override botExecuteTime;
-    uint256 public override tradeMoe;
 
     constructor(
         address _factory,
@@ -46,7 +46,6 @@ contract IntegralDelay is IIntegralDelay {
         orders.maxGasLimit = 5000000;
         orders.gasPriceInertia = 20000000;
         orders.maxGasPriceImpact = 1000000;
-        tradeMoe = 100001 * 10**13;
     }
 
     function getTransferGasCost(address token) public view override returns (uint256 gasCost) {
@@ -201,11 +200,6 @@ contract IntegralDelay is IIntegralDelay {
     function setTransferGasCost(address token, uint256 gasCost) public override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.setTransferGasCost(token, gasCost);
-    }
-
-    function setTradeMoe(uint256 _tradeMoe) public override {
-        require(msg.sender == owner, 'ID_FORBIDDEN');
-        tradeMoe = _tradeMoe;
     }
 
     function deposit(Orders.DepositParams calldata depositParams)
@@ -607,11 +601,26 @@ contract IntegralDelay is IIntegralDelay {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         require(withdrawOrder.deadline >= block.timestamp, 'ID_EXPIRED');
 
-        (address pair, , ) = orders.getPairInfo(withdrawOrder.pairId);
+        (address pair, address token0, address token1) = orders.getPairInfo(withdrawOrder.pairId);
         IIntegralPair(pair).fullSync();
         TransferHelper.safeTransfer(pair, pair, withdrawOrder.liquidity);
-        (uint256 amount0, uint256 amount1) = IIntegralPair(pair).burn(withdrawOrder.to);
 
+        (uint256 wethAmount, uint256 amount0, uint256 amount1) = (0, 0, 0);
+        if (withdrawOrder.unwrap && (token0 == tokenShares.weth || token1 == tokenShares.weth)) {
+            bool success;
+            (success, wethAmount, amount0, amount1) = WithdrawHelper.withdrawAndUnwrap(
+                token0,
+                token1,
+                pair,
+                tokenShares.weth,
+                withdrawOrder.to
+            );
+            if (!success) {
+                tokenShares.onUnwrapFailed(withdrawOrder.to, wethAmount);
+            }
+        } else {
+            (amount0, amount1) = IIntegralPair(pair).burn(withdrawOrder.to);
+        }
         require(amount0 >= withdrawOrder.amount0Min && amount1 >= withdrawOrder.amount1Min, 'ID_INSUFFICIENT_AMOUNT');
     }
 
@@ -625,8 +634,8 @@ contract IntegralDelay is IIntegralDelay {
         IIntegralPair pair = IIntegralPair(pairAddress);
         pair.fullSync();
         uint256 amountIn = buyOrder.inverse
-            ? BuyHelper.getSwapAmount1In(tradeMoe, pairAddress, buyOrder.amountOut)
-            : BuyHelper.getSwapAmount0In(tradeMoe, pairAddress, buyOrder.amountOut);
+            ? BuyHelper.getSwapAmount1In(pairAddress, buyOrder.amountOut)
+            : BuyHelper.getSwapAmount0In(pairAddress, buyOrder.amountOut);
         require(amountInMax >= amountIn, 'ID_INSUFFICIENT_INPUT_AMOUNT');
         (uint256 amount0Out, uint256 amount1Out) = buyOrder.inverse
             ? (buyOrder.amountOut, uint256(0))

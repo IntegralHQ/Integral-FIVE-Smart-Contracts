@@ -16,6 +16,8 @@ import {
   overrides,
   pairAddressToPairId,
 } from '../shared/utilities'
+import { delayWithMixedDecimalsPairFixture } from '../shared/fixtures/delayWithMixedDecimalsPairFixture'
+import { parseUnits } from 'ethers/lib/utils'
 
 describe('IntegralDelay.executeDeposit', () => {
   const loadFixture = setupFixtureLoader()
@@ -286,6 +288,7 @@ describe('IntegralDelay.executeDeposit', () => {
       await oracle.setPrice(expandTo18Decimals(10))
       await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(200))
       await depositAndWait(delay, token0, token1, other, {
+        gasLimit: 720000,
         amount0: expandTo18Decimals(1),
         amount1: expandTo18Decimals(2),
         maxSwapPrice: makeFloatEncodable(expandTo18Decimals(20)),
@@ -603,5 +606,43 @@ describe('IntegralDelay.executeDeposit', () => {
     expect(order).to.deep.eq(orderInQueue)
     expect(await delay.lastProcessedOrderId()).to.eq(1)
     expect(await delay.newestOrderId()).to.eq(1)
+  })
+
+  it('minSwapPrice is calculated correctly for 8 decimals', async () => {
+    const { delay, addLiquidity, token0, token1, wallet, oracle } = await loadFixture(delayWithMixedDecimalsPairFixture)
+    const decimals0 = await token0.decimals()
+    const decimals1 = await token1.decimals()
+    await addLiquidity(parseUnits('200', decimals0), parseUnits('200', decimals1))
+    await oracle.setPrice(expandTo18Decimals('0.0002'))
+    await depositAndWait(delay, token0, token1, wallet, {
+      gasLimit: 650000,
+      amount0: parseUnits('2', decimals0),
+      amount1: BigNumber.from(0),
+      minSwapPrice: makeFloatEncodable(expandTo18Decimals('0.00018')),
+    })
+    const tx = await delay.execute(1, overrides)
+    const events = await getEvents(tx, 'OrderExecuted')
+    await expect(Promise.resolve(tx))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(1, true, '0x', getGasSpent(events[0]), getEthRefund(events[0]))
+  })
+
+  it('maxSwapPrice is calculated correctly for 8 decimals', async () => {
+    const { delay, addLiquidity, token0, token1, wallet, oracle } = await loadFixture(delayWithMixedDecimalsPairFixture)
+    const decimals0 = await token0.decimals()
+    const decimals1 = await token1.decimals()
+    await addLiquidity(parseUnits('200', decimals0), parseUnits('200', decimals1))
+    await oracle.setPrice(expandTo18Decimals(10))
+    await depositAndWait(delay, token0, token1, wallet, {
+      gasLimit: 650000,
+      amount0: BigNumber.from(0),
+      amount1: parseUnits('2', decimals1),
+      maxSwapPrice: makeFloatEncodable(expandTo18Decimals('10.2')),
+    })
+    const tx = await delay.execute(1, overrides)
+    const events = await getEvents(tx, 'OrderExecuted')
+    await expect(Promise.resolve(tx))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(1, true, '0x', getGasSpent(events[0]), getEthRefund(events[0]))
   })
 })

@@ -17,8 +17,9 @@ contract FailingERC20 {
     mapping(address => mapping(address => uint256)) public allowance;
 
     bool public revertBalanceOf = false;
-    bool public revertTransfer = false;
     bool public wasteTransferGas = false;
+    uint32 public revertAfter = uint32(-1);
+    uint32 public totalTransfers = 0;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -59,7 +60,8 @@ contract FailingERC20 {
         address to,
         uint256 value
     ) private {
-        require(!revertTransfer, 'FA_TRANSFER_OOPS');
+        require(totalTransfers < revertAfter, 'FA_TRANSFER_OOPS');
+        totalTransfers++;
         if (wasteTransferGas) {
             _wasteGas(100000);
         }
@@ -99,11 +101,11 @@ contract FailingERC20 {
         revertBalanceOf = value;
     }
 
-    function setRevertTransfer(bool value) external {
-        revertTransfer = value;
-    }
-
     function setWasteTransferGas(bool value) external {
         wasteTransferGas = value;
+    }
+
+    function setRevertAfter(uint32 value) external {
+        revertAfter = value;
     }
 }

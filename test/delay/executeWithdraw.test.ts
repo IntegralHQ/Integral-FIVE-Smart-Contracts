@@ -1,6 +1,9 @@
+import { parseUnits } from '@ethersproject/units'
 import { expect } from 'chai'
 import { BigNumber, providers } from 'ethers'
+import { EtherHater__factory } from '../../build/types'
 import { delayFixture } from '../shared/fixtures'
+import { delayFailingAndWethFixture } from '../shared/fixtures/delayFailingAndWethFixture'
 import { depositAndWait, withdrawAndWait } from '../shared/orders'
 import { setupFixtureLoader } from '../shared/setup'
 import { encodeErrorData } from '../shared/solidityError'
@@ -222,5 +225,100 @@ describe('IntegralDelay.executeWithdraw', () => {
 
     expect(out0.lt(expandTo18Decimals(1))).to.be.true
     expect(out1.lt(expandTo18Decimals(1))).to.be.true
+  })
+
+  it('can unwrap weth', async () => {
+    const { delay, token, weth, wethPair, addLiquidityETH, other } = await loadFixture(delayFixture)
+    await addLiquidityETH(expandTo18Decimals(1000), expandTo18Decimals(1000))
+
+    const ethBalanceBefore = await other.getBalance()
+    const wethBalanceBefore = await weth.balanceOf(other.address)
+
+    await withdrawAndWait(delay, wethPair, token, weth, other, {
+      liquidity: expandTo18Decimals(10),
+      unwrap: true,
+    })
+
+    const tx = await delay.execute(1, overrides)
+    const events = await getEvents(tx, 'OrderExecuted')
+    const ethRefund = getEthRefund(events[0])
+    await expect(Promise.resolve(tx))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(1, true, '0x', getGasSpent(events[0]), ethRefund)
+
+    const ethBalanceAfter = await other.getBalance()
+    const wethBalanceAfter = await weth.balanceOf(other.address)
+
+    expect(ethBalanceAfter.sub(ethRefund).sub(ethBalanceBefore)).to.deep.eq(parseUnits('9.98'))
+    expect(wethBalanceBefore).to.deep.eq(wethBalanceAfter)
+  })
+
+  it('cannot unwrap WETH', async () => {
+    const { delay, token, weth, wethPair, addLiquidityETH, wallet } = await loadFixture(delayFixture)
+    await addLiquidityETH(expandTo18Decimals(100), expandTo18Decimals(100))
+
+    const etherHater = await new EtherHater__factory(wallet).deploy(overrides)
+
+    const wethAmount = expandTo18Decimals(20)
+    await weth.deposit({ value: wethAmount })
+    await weth.transfer(wallet.address, wethAmount, overrides)
+
+    await depositAndWait(delay, token, weth, etherHater, {
+      amount0: expandTo18Decimals(10),
+      amount1: expandTo18Decimals(10),
+    })
+
+    await withdrawAndWait(delay, wethPair, token, weth, etherHater, {
+      liquidity: expandTo18Decimals(10),
+      unwrap: true,
+    })
+
+    const wethBalanceBefore = await weth.balanceOf(etherHater.address)
+    const balanceBefore = await wallet.provider.getBalance(etherHater.address)
+    const tx = await delay.execute(2, { ...overrides })
+    const wethBalanceAfter = await weth.balanceOf(etherHater.address)
+    const balanceAfter = await wallet.provider.getBalance(etherHater.address)
+
+    const orderExecuted = await getEvents(tx, 'OrderExecuted')
+    const [event] = await getEvents(tx, 'UnwrapFailed')
+    function getAmount(event: any) {
+      return event.args.amount
+    }
+    await expect(Promise.resolve(tx))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(1, true, '0x', getGasSpent(orderExecuted[0]), getEthRefund(orderExecuted[0]))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(2, true, '0x', getGasSpent(orderExecuted[1]), getEthRefund(orderExecuted[1]))
+      .to.emit(delay, 'UnwrapFailed')
+      .withArgs(etherHater.address, getAmount(event))
+
+    expect(balanceBefore).to.eq(balanceAfter)
+    expect(wethBalanceAfter.sub(wethBalanceBefore)).to.deep.eq(parseUnits('9.98'))
+  })
+
+  it('cannot send token', async () => {
+    const { delay, failingToken, weth, wethPair, addLiquidityETH, wallet } = await loadFixture(
+      delayFailingAndWethFixture
+    )
+    await addLiquidityETH(expandTo18Decimals(100), expandTo18Decimals(100))
+
+    await withdrawAndWait(delay, wethPair, failingToken, weth, wallet, {
+      liquidity: expandTo18Decimals(10),
+      unwrap: true,
+    })
+
+    await failingToken.setRevertAfter((await failingToken.totalTransfers()) + 1)
+    const tx = await delay.execute(1, { ...overrides })
+
+    const orderExecuted = await getEvents(tx, 'OrderExecuted')
+    await expect(Promise.resolve(tx))
+      .to.emit(delay, 'OrderExecuted')
+      .withArgs(
+        1,
+        false,
+        encodeErrorData('TH_TRANSFER_FAILED'),
+        getGasSpent(orderExecuted[0]),
+        getEthRefund(orderExecuted[0])
+      )
   })
 })

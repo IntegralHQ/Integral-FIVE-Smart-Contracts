@@ -5,14 +5,14 @@ pragma solidity 0.7.5;
 
 import './interfaces/IIntegralPair.sol';
 import './libraries/Reserves.sol';
-import './IntegralERC20.sol';
+import './IntegralLPToken.sol';
 import './libraries/Math.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IIntegralFactory.sol';
 import './interfaces/IIntegralOracle.sol';
 import './libraries/Normalizer.sol';
 
-contract IntegralPair is Reserves, IntegralERC20, IIntegralPair {
+contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
     using SafeMath for uint256;
     using Normalizer for uint256;
 

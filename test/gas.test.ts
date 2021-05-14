@@ -26,7 +26,7 @@ describe('Gas costs', () => {
     'delay.executeWithdraw': 220000,
     'delay.buy': 340000,
     'delay.buy (second)': 181000,
-    'delay.executeBuy': 311000,
+    'delay.executeBuy': 318000,
     'delay.sell': 340000,
     'delay.sell (second)': 181000,
     'delay.executeSell': 270000,

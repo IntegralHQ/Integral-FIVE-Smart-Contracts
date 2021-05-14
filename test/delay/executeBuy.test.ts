@@ -123,11 +123,7 @@ describe('IntegralDelay.executeBuy', () => {
       await oracle.setPrice(expandTo18Decimals(1), overrides)
 
       await buyAndWait(delay, token0, token1, wallet, {
-        amountInMax: await buyHelper.getSwapAmount0In(
-          BigNumber.from('100001').mul(BigNumber.from(10).pow(13)).toString(),
-          pair.address,
-          expandTo18Decimals(1)
-        ),
+        amountInMax: await buyHelper.getSwapAmount0In(pair.address, expandTo18Decimals(1)),
         amountOut: expandTo18Decimals(1),
         gasLimit: 450000,
       })
@@ -178,7 +174,7 @@ describe('IntegralDelay.executeBuy', () => {
       const etherHater = await new EtherHater__factory(wallet).deploy(overrides)
 
       const buyRequest = await buyAndWait(delay, token, weth, etherHater, {
-        gasLimit: 490000,
+        gasLimit: 520000,
         amountInMax: expandTo18Decimals(5),
         amountOut: expandTo18Decimals(1),
         wrapUnwrap: true,

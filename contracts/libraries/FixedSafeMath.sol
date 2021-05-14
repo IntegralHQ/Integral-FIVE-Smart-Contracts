@@ -25,11 +25,11 @@ library FixedSafeMath {
     }
 
     function f18Mul(int256 a, int256 b) internal pure returns (int256) {
-        return _div(_mul(a, b), ONE);
+        return div(mul(a, b), ONE);
     }
 
     function f18Div(int256 a, int256 b) internal pure returns (int256) {
-        return _div(_mul(a, ONE), b);
+        return div(mul(a, ONE), b);
     }
 
     function f18Sqrt(int256 value) internal pure returns (int256) {
@@ -37,7 +37,7 @@ library FixedSafeMath {
         return int256(Math.sqrt(SafeMath.mul(uint256(value), uint256(ONE))));
     }
 
-    function _mul(int256 a, int256 b) private pure returns (int256) {
+    function mul(int256 a, int256 b) internal pure returns (int256) {
         // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
         // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
@@ -53,7 +53,7 @@ library FixedSafeMath {
         return c;
     }
 
-    function _div(int256 a, int256 b) private pure returns (int256) {
+    function div(int256 a, int256 b) internal pure returns (int256) {
         require(b != 0, 'FM_DIVISION_BY_ZERO');
         require(!(b == -1 && a == _INT256_MIN), 'FM_DIVISION_OVERFLOW');
 

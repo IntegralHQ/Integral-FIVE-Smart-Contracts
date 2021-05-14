@@ -31,4 +31,13 @@ library SafeMath {
         uint256 c = a / b;
         return c;
     }
+
+    function ceil_div(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        c = div(a, b);
+        if (c == mul(a, b)) {
+            return c;
+        } else {
+            return add(c, 1);
+        }
+    }
 }

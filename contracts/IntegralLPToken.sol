@@ -5,7 +5,7 @@ pragma solidity 0.7.5;
 
 import './libraries/AbstractERC20.sol';
 
-contract IntegralERC20 is AbstractERC20 {
+contract IntegralLPToken is AbstractERC20 {
     string public constant override name = 'Integral LP';
     string public constant override symbol = 'ITGR-LP';
     uint8 public constant override decimals = 18;
