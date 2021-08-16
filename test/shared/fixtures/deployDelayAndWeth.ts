@@ -1,20 +1,15 @@
-import { constants, Wallet } from 'ethers'
+import { Wallet } from 'ethers'
 
-import { IntegralOracle, UnitOracle, IntegralFactory, DelayTest__factory } from '../../../build/types'
+import { IntegralOracle, UnitOracle, IntegralFactory, IntegralOracleV3 } from '../../../build/types'
 import { deployWethPair } from './deployWethPair'
-import { deployLibraries } from './deployLibraries'
+import { deployDelay } from './deployDelay'
 
 export async function deployDelayAndWeth(
   wallet: Wallet,
-  oracle: IntegralOracle | UnitOracle,
+  oracle: IntegralOracle | UnitOracle | IntegralOracleV3,
   factory: IntegralFactory
 ) {
   const { weth, token, pair: wethPair, addLiquidityETH } = await deployWethPair(wallet, oracle, factory)
-  const { libraries, orders, tokenShares, buyHelper } = await deployLibraries(wallet)
-  const delay = await new DelayTest__factory(libraries, wallet).deploy(
-    factory.address,
-    weth.address,
-    constants.AddressZero
-  )
-  return { delay, token, wethPair, addLiquidityETH, weth, orders, tokenShares, libraries, buyHelper }
+  const { delay, ...libraries } = await deployDelay(wallet, factory, weth)
+  return { token, wethPair, addLiquidityETH, weth, delay, ...libraries }
 }

@@ -5,7 +5,7 @@ import { oracleWithUniswapFixture } from '../shared/fixtures'
 import { expandTo18Decimals, overrides } from '../shared/utilities'
 import { constants } from 'ethers'
 
-describe('IntegralOracle.setUniswapPair', () => {
+describe('IntegralOracleV2.setUniswapPair', () => {
   const loadFixture = setupFixtureLoader()
 
   it('performs security checkings', async () => {

@@ -40,7 +40,6 @@ describe('IntegralDelay.executeBuy', () => {
       await buyAndWait(delay, token0, token1, wallet, {
         amountInMax: expandTo18Decimals(4),
         amountOut: expandTo18Decimals(1),
-        gasLimit: 450000,
       })
 
       const tx = await delay.execute(1, overrides)
@@ -61,7 +60,6 @@ describe('IntegralDelay.executeBuy', () => {
       await buyAndWait(delay, token1, token0, wallet, {
         amountInMax: expandTo18Decimals(4),
         amountOut: expandTo18Decimals(1),
-        gasLimit: 450000,
       })
       const tx = await delay.execute(1, overrides)
       const balanceAfter = await token0.balanceOf(wallet.address)
@@ -303,15 +301,20 @@ describe('IntegralDelay.executeBuy', () => {
     })
 
     it('if ether refund fails order is still in queue', async () => {
-      const { delay, token, weth, wallet, addLiquidityETH, wethPair } = await loadFixture(delayFixture)
+      const { delay, token, weth, wallet, addLiquidityETH, wethPair, buyHelper } = await loadFixture(delayFixture)
       await addLiquidityETH(expandTo18Decimals(100), expandTo18Decimals(100))
       const etherHater = await new EtherHater__factory(wallet).deploy(overrides)
 
+      const amountOut = expandTo18Decimals(1)
+      const amountInMax =
+        (await wethPair.token0()) == weth.address
+          ? await buyHelper.getSwapAmount0In(wethPair.address, amountOut)
+          : await buyHelper.getSwapAmount1In(wethPair.address, amountOut)
       const buy = await buyAndWait(delay, weth, token, wallet, {
         to: etherHater.address,
         etherAmount: expandTo18Decimals(4),
-        amountInMax: expandTo18Decimals(4),
-        amountOut: expandTo18Decimals(1),
+        amountInMax,
+        amountOut,
         gasLimit: 350000,
         wrapUnwrap: true,
       })
@@ -507,5 +510,142 @@ describe('IntegralDelay.executeBuy', () => {
     await expect(Promise.resolve(tx))
       .to.emit(delay, 'OrderExecuted')
       .withArgs(1, true, '0x', getGasSpent(events[0]), getEthRefund(events[0]))
+  })
+
+  describe('refund extra amountIn', () => {
+    it('token0 for token1', async () => {
+      const { delay, addLiquidity, token0, token1, wallet, buyHelper, pair } = await loadFixture(delayFixture)
+      await addLiquidity(expandTo18Decimals(10), expandTo18Decimals(10))
+
+      const balanceBefore = await token0.balanceOf(wallet.address)
+      const buy = await buyAndWait(delay, token0, token1, wallet, {
+        amountOut: expandTo18Decimals(1),
+        amountInMax: expandTo18Decimals(10),
+        gasLimit: 600000,
+      })
+
+      const expectedAmountIn = await buyHelper.getSwapAmount0In(pair.address, buy.amountOut)
+
+      const tx = await delay.execute(1, overrides)
+      const events = await getEvents(tx, 'OrderExecuted')
+      await expect(Promise.resolve(tx))
+        .to.emit(delay, 'OrderExecuted')
+        .withArgs(1, true, '0x', getGasSpent(events[0]), getEthRefund(events[0]))
+
+      const balanceAfter = await token0.balanceOf(wallet.address)
+      expect(balanceBefore.sub(balanceAfter)).to.eq(expectedAmountIn)
+    })
+
+    it('token1 for token0', async () => {
+      const { delay, addLiquidity, token0, token1, wallet, buyHelper, pair } = await loadFixture(delayFixture)
+      await addLiquidity(expandTo18Decimals(10), expandTo18Decimals(10))
+
+      const balanceBefore = await token1.balanceOf(wallet.address)
+      const buy = await buyAndWait(delay, token1, token0, wallet, {
+        amountOut: expandTo18Decimals(1),
+        amountInMax: expandTo18Decimals(10),
+        gasLimit: 600000,
+      })
+
+      const expectedAmountIn = await buyHelper.getSwapAmount1In(pair.address, buy.amountOut)
+
+      await delay.execute(1, overrides)
+
+      const balanceAfter = await token1.balanceOf(wallet.address)
+      expect(balanceBefore.sub(balanceAfter)).to.eq(expectedAmountIn)
+    })
+
+    it('amountInMax equals to amountIn', async () => {
+      const { delay, addLiquidity, token0, token1, wallet, buyHelper, pair } = await loadFixture(delayFixture)
+      await addLiquidity(expandTo18Decimals(10), expandTo18Decimals(10))
+
+      const balanceBefore = await token1.balanceOf(wallet.address)
+      const amountOut = expandTo18Decimals(1)
+      const expectedAmountIn = await buyHelper.getSwapAmount1In(pair.address, amountOut)
+
+      await buyAndWait(delay, token1, token0, wallet, {
+        amountOut,
+        amountInMax: expectedAmountIn,
+      })
+
+      await delay.execute(1, overrides)
+
+      const balanceAfter = await token1.balanceOf(wallet.address)
+      expect(balanceBefore.sub(balanceAfter)).to.eq(expectedAmountIn)
+    })
+
+    it('unwrap ether', async () => {
+      const { delay, addLiquidityETH, weth, token, buyHelper, wethPair, other } = await loadFixture(delayFixture)
+      await addLiquidityETH(expandTo18Decimals(10), expandTo18Decimals(10))
+
+      const balanceBefore = await other.getBalance()
+
+      const buy = await buyAndWait(delay, weth, token, other, {
+        amountOut: expandTo18Decimals(1),
+        amountInMax: expandTo18Decimals(10),
+        gasLimit: 600000,
+        wrapUnwrap: true,
+        etherAmount: expandTo18Decimals(10),
+      })
+
+      const expectedAmountIn =
+        (await wethPair.token0()) == weth.address
+          ? await buyHelper.getSwapAmount0In(wethPair.address, buy.amountOut)
+          : await buyHelper.getSwapAmount1In(wethPair.address, buy.amountOut)
+
+      await delay.execute(1, overrides)
+
+      const balanceAfter = await other.getBalance()
+      expect(balanceAfter.sub(balanceBefore).gt(buy.amountInMax.sub(expectedAmountIn))).to.be.true
+    })
+
+    it('token transfer fails', async () => {
+      const { token0, token1, delay, addLiquidity, wallet } = await loadFixture(delayFailingFixture)
+      await addLiquidity(expandTo18Decimals(10), expandTo18Decimals(10))
+      const buy = await buyAndWait(delay, token1, token0, wallet, {
+        amountOut: expandTo18Decimals(1),
+        amountInMax: expandTo18Decimals(10),
+        gasLimit: 600000,
+      })
+
+      await token1.setWasteTransferGas(true)
+      const tx = await delay.execute(1, overrides)
+      const events = await getEvents(tx, 'OrderExecuted')
+
+      await expect(Promise.resolve(tx))
+        .to.emit(delay, 'OrderExecuted')
+        .withArgs(1, false, encodeErrorData('TH_TRANSFER_FAILED'), getGasSpent(events[0]), getEthRefund(events[0]))
+        .to.emit(delay, 'RefundFailed')
+        .withArgs(wallet.address, token1.address, buy.amountInMax, encodeErrorData('TH_TRANSFER_FAILED'))
+    })
+
+    it('unwrap fails', async () => {
+      const { delay, addLiquidityETH, weth, token, buyHelper, wethPair, other } = await loadFixture(delayFixture)
+      await addLiquidityETH(expandTo18Decimals(10), expandTo18Decimals(10))
+      const etherHater = await new EtherHater__factory(other).deploy(overrides)
+      const balanceBefore = await weth.balanceOf(etherHater.address)
+
+      const etherAmount = expandTo18Decimals(10)
+      const buy = await buyAndWait(delay, weth, token, etherHater, {
+        amountOut: expandTo18Decimals(1),
+        amountInMax: expandTo18Decimals(10),
+        gasLimit: 600000,
+        wrapUnwrap: true,
+        etherAmount,
+      })
+
+      const expectedAmountIn =
+        (await wethPair.token0()) == weth.address
+          ? await buyHelper.getSwapAmount0In(wethPair.address, buy.amountOut)
+          : await buyHelper.getSwapAmount1In(wethPair.address, buy.amountOut)
+      const expectedWethTransfered = etherAmount.sub(expectedAmountIn)
+
+      await expect(delay.execute(1, overrides))
+        .to.emit(delay, 'UnwrapFailed')
+        .withArgs(etherHater.address, expectedWethTransfered)
+
+      const balanceAfter = await weth.balanceOf(etherHater.address)
+      expect(balanceAfter.sub(balanceBefore)).to.eq(expectedWethTransfered)
+    })
   })
 })

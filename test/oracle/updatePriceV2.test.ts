@@ -3,7 +3,7 @@ import { getOracleWithUniswapFixtureFor, oracleWithUniswapFixture } from '../sha
 import { setupFixtureLoader } from '../shared/setup'
 import { expandTo18Decimals, expandToDecimals, overrides } from '../shared/utilities'
 
-describe('IntegralOracle.updatePrice', () => {
+describe('IntegralOracleV2.updatePrice', () => {
   const loadFixture = setupFixtureLoader()
 
   const configurations = [

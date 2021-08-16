@@ -16,7 +16,8 @@
     "prebuild": "yarn clean",
     "build": "waffle .waffle.json && typechain --target ethers-v5 --outDir build/types 'build/*.json'",
     "test": "mocha",
-    "deploy": "ts-node deploy/index.ts",
+    "deploy:amm": "ts-node deploy/amm/index.ts",
+    "deploy:token": "ts-node deploy/token/index.ts",
     "prepublishOnly": "yarn build && yarn test",
     "start": "ts-node playground/deploy.ts",
     "execute": "ts-node scripts/bot/executeSingle.ts",
@@ -24,7 +25,12 @@
     "bot": "ts-node scripts/bot/run.ts",
     "enable": "ts-node scripts/disables/enable.ts",
     "disable": "ts-node scripts/disables/disable.ts",
-    "set-owner": "ts-node scripts/owner/index.ts"
+    "set-owner": "ts-node scripts/owner/index.ts",
+    "set-allocations": "ts-node scripts/allocations/setAllocations.ts",
+    "stop-option": "ts-node scripts/stop/index.ts",
+    "check-allocations": "ts-node scripts/allocations/checkAllocations.ts",
+    "preview": "ts-node scripts/preview/index.ts",
+    "skim": "ts-node scripts/skim/index.ts"
   },
   "devDependencies": {
     "@resolver-engine/imports-fs": "^0.3.3",
@@ -35,11 +41,11 @@
     "@types/sinon": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",
-    "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "argparse": "^2.0.1",
     "axios": "^0.21.1",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
+    "csv-parser": "^3.0.0",
     "eslint": "^7.15.0",
     "ethereum-waffle": "^3.2.1",
     "ethereumjs-util": "^7.0.7",
@@ -57,6 +63,9 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
+    "@uniswap/v2-periphery": "^1.1.0-beta.0",
+    "@uniswap/v3-core": "^1.0.0",
+    "@uniswap/v3-periphery": "^1.1.1",
     "dotenv": "^8.2.0"
   }
 }

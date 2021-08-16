@@ -117,7 +117,9 @@ describe('IntegralDelay.performRefund', () => {
       await token1.transfer(other.address, expandTo18Decimals(10))
 
       const token0InitialBalance = await token0.balanceOf(other.address)
-      const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
+      const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other, {
+        gasLimit: 400000,
+      })
 
       await token0.setWasteTransferGas(true)
       const tx = await delay.execute(1, overrides)
@@ -147,7 +149,9 @@ describe('IntegralDelay.performRefund', () => {
       await token1.transfer(other.address, expandTo18Decimals(10))
 
       const initialToken0OwnerBalance = await token0.balanceOf(wallet.address)
-      const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
+      const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other, {
+        gasLimit: 400000,
+      })
 
       await token0.setWasteTransferGas(true)
       const tx = await delay.execute(1, overrides)

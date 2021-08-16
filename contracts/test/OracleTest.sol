@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 
 import '../IntegralOracle.sol';
 
-contract TestOracle is IntegralOracle {
+contract OracleTest is IntegralOracle {
     constructor(uint8 _xDecimals, uint8 _yDecimals) IntegralOracle(_xDecimals, _yDecimals) {}
 
     function setPrice(int256 _price) public {

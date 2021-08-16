@@ -8,7 +8,7 @@ import { deployDelayAndWeth } from './deployDelayAndWeth'
 import { oracleFixture } from './oracleFixture'
 import { setTokenTransferCosts } from './setTokenTransferCosts'
 
-type UniswapPair = {
+export type UniswapPair = {
   token0: IERC20
   oracle: IntegralOracle
   pair: IUniswapV2Pair
@@ -87,5 +87,7 @@ export async function integralAndUniswapFixture([wallet]: Wallet[]) {
     uniswapPair01: uniswapPair01.pair,
     uniswapPair23: uniswapPair23.pair,
     swapOnUniswapPair,
+    factory,
+    oracle01: uniswapPair01.oracle,
   }
 }

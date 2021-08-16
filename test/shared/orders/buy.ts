@@ -3,7 +3,7 @@ import { IERC20, IntegralDelay } from '../../../build/types'
 import { expandTo18Decimals, overrides } from '../utilities'
 
 export const getDefaultBuy = (tokenIn: IERC20, tokenOut: IERC20, wallet: Wallet | Contract) => ({
-  gasLimit: 400000,
+  gasLimit: 550000,
   gasPrice: utils.parseUnits('100', 'gwei') as BigNumberish,
   etherAmount: expandTo18Decimals(0),
   wrapUnwrap: false,

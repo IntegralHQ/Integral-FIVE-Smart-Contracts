@@ -5,7 +5,7 @@ import { buyAndWait, depositAndWait, sellAndWait, withdrawAndWait } from './shar
 import { setupFixtureLoader } from './shared/setup'
 import { expandTo18Decimals, getEthRefund, getEvents, getGasSpent, overrides } from './shared/utilities'
 
-describe('integration', () => {
+describe('integrationV2', () => {
   const loadFixture = setupFixtureLoader()
 
   it('makes different transactions on pairs', async () => {
@@ -52,8 +52,8 @@ describe('integration', () => {
       })
     }
 
-    let initialamount0 = await token0.balanceOf(wallet.address)
-    let initialamount1 = await token1.balanceOf(wallet.address)
+    let initialToken0Amount = await token0.balanceOf(wallet.address)
+    let initialToken1Amount = await token1.balanceOf(wallet.address)
     const deposit0 = { amount0: 10, amount1: 15 }
     const deposit1 = { amount0: 2, amount1: 5 }
 
@@ -76,12 +76,18 @@ describe('integration', () => {
 
     const token0Deposited = expandTo18Decimals(deposit0.amount0 + deposit1.amount0)
     const token1Deposited = expandTo18Decimals(deposit0.amount1 + deposit1.amount1)
+    const excessedToken1Deposit = expandTo18Decimals(
+      deposit1.amount1 - (deposit0.amount1 / deposit0.amount0) * deposit1.amount0
+    )
 
     expect(await token0.balanceOf(wallet.address)).to.gt(
-      initialamount0.sub(token0Deposited).sub(expandTo18Decimals(token0MaxIn))
+      initialToken0Amount.sub(token0Deposited).sub(expandTo18Decimals(token0MaxIn))
     )
-    expect(await token1.balanceOf(wallet.address)).to.eq(
-      initialamount1.sub(token1Deposited).add(expandTo18Decimals(token1Out))
+    expect(await token1.balanceOf(wallet.address)).to.gt(
+      initialToken1Amount.sub(token1Deposited).add(expandTo18Decimals(token1Out))
+    )
+    expect(await token1.balanceOf(wallet.address)).to.lt(
+      initialToken1Amount.sub(token1Deposited).add(expandTo18Decimals(token1Out)).add(excessedToken1Deposit)
     )
 
     await sell(token0, token1, 3, 4)
@@ -127,8 +133,8 @@ describe('integration', () => {
     expect(await token2.balanceOf(wallet.address)).to.gt(initialToken2Amount)
     expect(await token3.balanceOf(wallet.address)).to.lt(initialToken3Amount)
 
-    initialamount0 = await token0.balanceOf(wallet.address)
-    initialamount1 = await token1.balanceOf(wallet.address)
+    initialToken0Amount = await token0.balanceOf(wallet.address)
+    initialToken1Amount = await token1.balanceOf(wallet.address)
     initialToken2Amount = await token2.balanceOf(wallet.address)
     initialToken3Amount = await token3.balanceOf(wallet.address)
 
@@ -171,8 +177,8 @@ describe('integration', () => {
       .to.emit(delay, 'OrderExecuted')
       .withArgs(17, true, '0x', getGasSpent(events[7]), getEthRefund(events[7]))
 
-    expect(await token0.balanceOf(wallet.address)).to.lt(initialamount0)
-    expect(await token1.balanceOf(wallet.address)).to.lt(initialamount1)
+    expect(await token0.balanceOf(wallet.address)).to.lt(initialToken0Amount)
+    expect(await token1.balanceOf(wallet.address)).to.lt(initialToken1Amount)
     expect(await token2.balanceOf(wallet.address)).to.lt(initialToken2Amount)
     expect(await token3.balanceOf(wallet.address)).to.gt(initialToken3Amount)
   }).timeout(30_000)

@@ -1,11 +1,22 @@
 import { Wallet, BigNumber } from 'ethers'
 
 import { expandTo18Decimals, overrides } from '../utilities'
-import { ERC20__factory, IntegralOracle, WETH9__factory, IntegralFactory, UnitOracle } from '../../../build/types'
+import {
+  ERC20__factory,
+  IntegralOracle,
+  WETH9__factory,
+  IntegralFactory,
+  UnitOracle,
+  IntegralOracleV3,
+} from '../../../build/types'
 
 import { deployPairForTokens } from './deployPairForTokens'
 
-export async function deployWethPair(wallet: Wallet, oracle: IntegralOracle | UnitOracle, factory: IntegralFactory) {
+export async function deployWethPair(
+  wallet: Wallet,
+  oracle: IntegralOracle | UnitOracle | IntegralOracleV3,
+  factory: IntegralFactory
+) {
   const weth = await new WETH9__factory(wallet).deploy(overrides)
   const token = await new ERC20__factory(wallet).deploy(expandTo18Decimals(10000), overrides)
 

@@ -1,5 +1,6 @@
 {
   "ganache": {
+    "owner": "",
     "tokens": {
       "wbtc": "0xA193E42526F1FEA8C99AF609dcEabf30C1c29fAA",
       "usdc": "0xFDFEF9D10d929cB3905C71400ce6be1990EA0F34",
@@ -16,6 +17,7 @@
     "delay": "0x84e924C5E04438D2c1Df1A981f7E7104952e6de1"
   },
   "kovan": {
+    "owner": "0xFf030bEb0335432e156A0Ee55Bd87850eAaD228E",
     "tokens": {
       "wbtc": "0xECC7Fe95dE1E44871246122cfEC2193fd4053ba3",
       "usdc": "0xc6E44B1222630ad4b35b387540a0bBEF06F7D079",
@@ -29,33 +31,81 @@
       "weth-usdc": "0x489453a8B2383969905Ce458930b876C8b74547E",
       "weth-usdt": "0xA639BC1c8B32eA5103B850d4664e89fF7CE97781",
       "weth-dai": "0x55AaAa1fD4247f25D92080CB2E6AfE15c9d73637",
-      "weth-link": "0x49988422155D981f43A795252fd15398fBF85075"
+      "weth-link": "0x49988422155D981f43A795252fd15398fBF85075",
+      "dai-usdc": "0xda70F0f062F79C7d112b272F171b9a0e2Ffd802C",
+      "dai-usdt": "0x138Dba02F481A637A1F586D737e7A9896191b267",
+      "usdc-usdt": "0xcE2951067a1b4479809adED7eFE7061CF84bFff4"
     },
     "oracles": {
       "weth-wbtc": "0x607E78fDE2B1DDFc3f5F5726925378908196196F",
       "weth-usdc": "0xe69bFb70aF116Bd4Cf11C7f2572C8A5D89AA4e40",
       "weth-usdt": "0xdF6F6f22Dd957436a0572aADe163B6548d599cBF",
       "weth-dai": "0xA660650695ad751a346634eD1d110B4c48cE8683",
-      "weth-link": "0x519Dab7335E23E3556Ef48904011074455D0D4C8"
+      "weth-link": "0x519Dab7335E23E3556Ef48904011074455D0D4C8",
+      "dai-usdc": "0xCaaa7d69F0831A52D4efC18824d01404a810B1a2",
+      "dai-usdt": "0x6A902fbf0be6E585309b86A5C935C4450C58bC5B",
+      "usdc-usdt": "0x47AfBe7aB54d15F49459677C126aaec6FD698d62"
     },
     "factory": "0xf656eb4f9f9f108e618Ede0022cD0E442cEfe833",
     "reader": "0x5a82eC7076a3Fb9Fc10e5D90e1cDA15372864c39",
-    "delay": "0x1177e3498ec4f8565E9972b063FAAF3099f25335",
+    "delay": "0x440C48003a5D3345514021D7D3a5141ECf7286Fd",
     "uniswap": {
       "factory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
       "weth-wbtc": "0xD43AC4C627F794d9f2702F3aE3B7972104E24C5D",
       "weth-usdc": "0x75DB3FC2C1f45d9781B349331eF72AB184c91125",
       "weth-usdt": "0x3794bc288b2C42544B50b71aC22368d827b8A766",
       "weth-dai": "0x7593265FA9FC4fA49E43a1518D63f79d728Cdc1a",
-      "weth-link": "0x2F86312C1cc0606BB76c368e7Ad9178e4d7F837F"
+      "weth-link": "0x2F86312C1cc0606BB76c368e7Ad9178e4d7F837F",
+      "dai-usdc": "0xAF40fcFD6B4585c2e97e71080Ab3e8f3E10E4E1C",
+      "dai-usdt": "0xE2C4df476B061a748b99d89ADc9CE483A048fA73",
+      "usdc-usdt": "0x08C7Fd3Ea6D739db2Ed963521126C30F7a158189"
     },
     "tokenShares": "0x8C828E61a9ECDc297aE3cdD36fA6102A9D3e7BFe",
     "orders": "0xA5f52Dcdf340aBDAB12B47be54DbD5934B6C62f4",
     "addLiquidity": "0x167b060b16B3AAD0b6826fc4561550f1deAbA034",
     "buyHelper": "0x8FB37D93c257053606d92fcD2f12428e826DF04b",
-    "withdrawHelper": "0x421137A857cf993363F60E1EA3992AE66d92c89c"
+    "withdrawHelper": "0x421137A857cf993363F60E1EA3992AE66d92c89c",
+    "integralToken": "0x907519bb0a5e7147a0f43acDA54aa193ed1D0234",
+    "integralTimeRelease": "0x2AcfDe302d538f600483D852907E96120a81D57B",
+    "uniswapV3": {
+      "factory": "0x74e838ECf981Aaef2523aa5B666175DA319D8D31",
+      "dai-usdc": "0x49028B9C3d3Da7c64AB7D84a67919D8023f155cE",
+      "dai-usdt": "0x5EcD2f15D6304EF5C75Ee99e823FB2126091F91B",
+      "usdc-usdt": "0x03d200C2Cb41aEDa6c99Eb4f1c5ccB8E747cFeC0"
+    },
+    "uniswapV2": {
+      "factory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+      "weth-wbtc": "0xD43AC4C627F794d9f2702F3aE3B7972104E24C5D",
+      "weth-usdc": "0x75DB3FC2C1f45d9781B349331eF72AB184c91125",
+      "weth-usdt": "0x3794bc288b2C42544B50b71aC22368d827b8A766",
+      "weth-dai": "0x7593265FA9FC4fA49E43a1518D63f79d728Cdc1a",
+      "weth-link": "0x2F86312C1cc0606BB76c368e7Ad9178e4d7F837F",
+      "dai-usdc": "0xAF40fcFD6B4585c2e97e71080Ab3e8f3E10E4E1C",
+      "dai-usdt": "0xE2C4df476B061a748b99d89ADc9CE483A048fA73",
+      "usdc-usdt": "0x08C7Fd3Ea6D739db2Ed963521126C30F7a158189"
+    },
+    "oraclesV2": {
+      "weth-wbtc": "0x607E78fDE2B1DDFc3f5F5726925378908196196F",
+      "weth-usdc": "0xe69bFb70aF116Bd4Cf11C7f2572C8A5D89AA4e40",
+      "weth-usdt": "0xdF6F6f22Dd957436a0572aADe163B6548d599cBF",
+      "weth-dai": "0xA660650695ad751a346634eD1d110B4c48cE8683",
+      "weth-link": "0x519Dab7335E23E3556Ef48904011074455D0D4C8",
+      "dai-usdc": "0xCaaa7d69F0831A52D4efC18824d01404a810B1a2",
+      "dai-usdt": "0x6A902fbf0be6E585309b86A5C935C4450C58bC5B",
+      "usdc-usdt": "0x47AfBe7aB54d15F49459677C126aaec6FD698d62"
+    },
+    "oraclesV3": {
+      "dai-usdc": "0x5c172A53FA7e3234d8aF3cEf9BBB29a3C832CE02",
+      "dai-usdt": "0x5C5DA00B2E8506bd6920132C28dae9f8Af257c38",
+      "usdc-usdt": "0x9e4C723A92659F300377B9658459896Ea5e256Bf"
+    },
+    "integralStaking": {
+      "sixMonths": "0xD0c2220F5aA156Bf37338C52BdB61219E8D41E0C",
+      "threeYears": "0x154590de021e85742739e5434171d045247642A0"
+    }
   },
   "ropsten": {
+    "owner": "0xFf030bEb0335432e156A0Ee55Bd87850eAaD228E",
     "tokens": {
       "wbtc": "0x2d80502854fc7304c3e3457084de549f5016b73f",
       "usdc": "0x0d9c8723b343a8368bebe0b5e89273ff8d712e3c",
@@ -72,6 +122,7 @@
     }
   },
   "mainnet": {
+    "owner": "0xFf030bEb0335432e156A0Ee55Bd87850eAaD228E",
     "tokens": {
       "wbtc": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
       "usdc": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
@@ -86,7 +137,10 @@
       "weth-usdc": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
       "weth-usdt": "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852",
       "weth-dai": "0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11",
-      "weth-link": "0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974"
+      "weth-link": "0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974",
+      "dai-usdc": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
+      "dai-usdt": "0xB20bd5D04BE54f870D5C0d3cA85d82b34B836405",
+      "usdc-usdt": "0x3041CbD36888bECc7bbCBc0045E3B1f144466f5f"
     },
     "factory": "0x673662e97B05e001816c380bA5a628D2E29f55D1",
     "tokenShares": "0xc82938b53e0e190459ba4e3502bf26f194760183",
@@ -98,17 +152,56 @@
       "weth-usdc": "0x48C1a83c9496F0d6f0000b6D7F78C7b23F9e9C5a",
       "weth-usdt": "0xBBe23abceC15428916eCfb3FD121296a914413A5",
       "weth-dai": "0x580De7Dfdf1ed5cce84dc113ffB1D30D3bA9e195",
-      "weth-link": "0xa17E1D78f4F159294b851D44879B9289f074cEa7"
+      "weth-link": "0xa17E1D78f4F159294b851D44879B9289f074cEa7",
+      "dai-usdc": "0x3661A53b76B3aC0eb0bC454B87df434762F045e0",
+      "dai-usdt": "0xB6A9EBF596729969612a3888af55330B603DAc9f",
+      "usdc-usdt": "0x851cB798b29560188BD0F87Ef945154Bbb3971c1"
     },
     "pairs": {
       "weth-wbtc": "0x5dFAe56E344B18bC7cd3B8350721FfdD12Ff2b3C",
       "weth-usdc": "0x8b0Bb0d0D8B3D83EBb7c1B49d79D74dF396634c6",
       "weth-usdt": "0x3eD27247A8abF40d3D85171536ea98e5eEd94F40",
       "weth-dai": "0x5FB51deDd29b8C065cA3Ac4545b6c58b635616C5",
-      "weth-link": "0x4370CFD2c62b6E2900D04af97c4D9552484C0e48"
+      "weth-link": "0x4370CFD2c62b6E2900D04af97c4D9552484C0e48",
+      "dai-usdc": "0x01d9984489bD4c5f372a6e6Eca1F22c27A77e355",
+      "dai-usdt": "0xcddD3B9EACce44DDf9d5748C8e8b5F8d630f17EB",
+      "usdc-usdt": "0x3fFecc12a6B46C3Aa32aEA38ac34EfbB6C9B6052"
     },
     "reader": "0xB2587B00f3EAef6037e70da7d0005B3fC6D353a3",
     "buyHelper": "0x1412524711D58c4927dE00446682AaBb3F33c6E5",
-    "withdrawHelper": "0xb0abc66f199Fb295DC3F6e968e8bA0db03821102"
+    "withdrawHelper": "0xb0abc66f199Fb295DC3F6e968e8bA0db03821102",
+    "integralToken": "0x5bC96017dcCacA53601d92125C5C6Db81d000Da5",
+    "uniswapV3": {
+      "factory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+      "dai-usdc": "0x6c6Bc977E13Df9b0de53b251522280BB72383700",
+      "dai-usdt": "0x6f48ECa74B38d2936B02ab603FF4e36A6C0E3A77",
+      "usdc-usdt": "0x7858E59e0C01EA06Df3aF3D20aC7B0003275D4Bf"
+    },
+    "uniswapV2": {
+      "factory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+      "weth-wbtc": "0xBb2b8038a1640196FbE3e38816F3e67Cba72D940",
+      "weth-usdc": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+      "weth-usdt": "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852",
+      "weth-dai": "0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11",
+      "weth-link": "0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974",
+      "dai-usdc": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
+      "dai-usdt": "0xB20bd5D04BE54f870D5C0d3cA85d82b34B836405",
+      "usdc-usdt": "0x3041CbD36888bECc7bbCBc0045E3B1f144466f5f"
+    },
+    "oraclesV2": {
+      "weth-wbtc": "0xA12A0AB13e43c3F9A501Be4b809AfbB639113320",
+      "weth-usdc": "0x48C1a83c9496F0d6f0000b6D7F78C7b23F9e9C5a",
+      "weth-usdt": "0xBBe23abceC15428916eCfb3FD121296a914413A5",
+      "weth-dai": "0x580De7Dfdf1ed5cce84dc113ffB1D30D3bA9e195",
+      "weth-link": "0xa17E1D78f4F159294b851D44879B9289f074cEa7",
+      "dai-usdc": "0x3661A53b76B3aC0eb0bC454B87df434762F045e0",
+      "dai-usdt": "0xB6A9EBF596729969612a3888af55330B603DAc9f",
+      "usdc-usdt": "0x851cB798b29560188BD0F87Ef945154Bbb3971c1"
+    },
+    "oraclesV3": {
+      "dai-usdc": "0x70739a5450A5465ec435266D9131ABd1666d4274",
+      "dai-usdt": "0xe95Fee72450Bac57ED45749c8c61829ecEA5d299",
+      "usdc-usdt": "0x289596138E443A19fF0cA7486dbE7822E72fff16"
+    }
   }
 }

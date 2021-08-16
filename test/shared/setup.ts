@@ -6,6 +6,7 @@ interface FixtureReturns {
   provider: MockProvider
   wallet: Wallet
   other: Wallet
+  another: Wallet
 }
 
 let loadFixture: ReturnType<typeof setupOnce> | undefined
@@ -27,9 +28,9 @@ function setupOnce() {
         gasLimit: 9999999,
       },
     })
-    const [wallet, other] = provider.getWallets()
+    const [wallet, other, another] = provider.getWallets()
     const loader = createFixtureLoader([wallet, other], provider)
-    const returns = { provider, wallet, other }
+    const returns = { provider, wallet, other, another }
     return { loader, returns }
   }
 

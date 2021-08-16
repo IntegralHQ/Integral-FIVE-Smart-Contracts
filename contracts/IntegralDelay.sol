@@ -463,7 +463,7 @@ contract IntegralDelay is IIntegralDelay {
             IWETH(tokenShares.weth).withdraw(amount);
             payable(to).transfer(amount);
         } else {
-            return TransferHelper.safeTransfer(token, to, tokenShares.sharesToAmount(token, share));
+            TransferHelper.safeTransfer(token, to, tokenShares.sharesToAmount(token, share));
         }
     }
 
@@ -637,17 +637,20 @@ contract IntegralDelay is IIntegralDelay {
             ? BuyHelper.getSwapAmount1In(pairAddress, buyOrder.amountOut)
             : BuyHelper.getSwapAmount0In(pairAddress, buyOrder.amountOut);
         require(amountInMax >= amountIn, 'ID_INSUFFICIENT_INPUT_AMOUNT');
+        if (amountInMax > amountIn) {
+            if (tokenIn == tokenShares.weth && buyOrder.unwrap) {
+                _forceEtherTransfer(buyOrder.to, amountInMax.sub(amountIn));
+            } else {
+                TransferHelper.safeTransfer(tokenIn, buyOrder.to, amountInMax.sub(amountIn));
+            }
+        }
         (uint256 amount0Out, uint256 amount1Out) = buyOrder.inverse
             ? (buyOrder.amountOut, uint256(0))
             : (uint256(0), buyOrder.amountOut);
         TransferHelper.safeTransfer(tokenIn, pairAddress, amountIn);
         if (tokenOut == tokenShares.weth && buyOrder.unwrap) {
             pair.swap(amount0Out, amount1Out, address(this));
-            IWETH(tokenShares.weth).withdraw(buyOrder.amountOut);
-            (bool success, ) = buyOrder.to.call{ value: buyOrder.amountOut, gas: Orders.ETHER_TRANSFER_CALL_COST }('');
-            if (!success) {
-                tokenShares.onUnwrapFailed(buyOrder.to, buyOrder.amountOut);
-            }
+            _forceEtherTransfer(buyOrder.to, buyOrder.amountOut);
         } else {
             pair.swap(amount0Out, amount1Out, buyOrder.to);
         }
@@ -670,13 +673,17 @@ contract IntegralDelay is IIntegralDelay {
             : (uint256(0), amountOut);
         if (tokenOut == tokenShares.weth && sellOrder.unwrap) {
             pair.swap(amount0Out, amount1Out, address(this));
-            IWETH(tokenShares.weth).withdraw(amountOut);
-            (bool success, ) = sellOrder.to.call{ value: amountOut, gas: Orders.ETHER_TRANSFER_CALL_COST }('');
-            if (!success) {
-                tokenShares.onUnwrapFailed(sellOrder.to, amountOut);
-            }
+            _forceEtherTransfer(sellOrder.to, amountOut);
         } else {
             pair.swap(amount0Out, amount1Out, sellOrder.to);
+        }
+    }
+
+    function _forceEtherTransfer(address to, uint256 amount) internal {
+        IWETH(tokenShares.weth).withdraw(amount);
+        (bool success, ) = to.call{ value: amount, gas: Orders.ETHER_TRANSFER_CALL_COST }('');
+        if (!success) {
+            tokenShares.onUnwrapFailed(to, amount);
         }
     }
 

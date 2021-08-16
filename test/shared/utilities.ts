@@ -1,9 +1,11 @@
-import { BigNumber, utils, constants, Wallet, ContractTransaction, Event } from 'ethers'
-import { ERC20 } from '../../build/types'
+import { BigNumber, utils, constants, Wallet, ContractTransaction, Event, providers } from 'ethers'
+import { ERC20, IntegralToken } from '../../build/types'
 
 const PERMIT_TYPEHASH = utils.keccak256(
   utils.toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
 )
+
+export const MAX_UINT_96 = BigNumber.from(2).pow(96).sub(1)
 
 export function expandTo18Decimals(n: number | string): BigNumber {
   return expandToDecimals(n, 18)
@@ -86,8 +88,44 @@ export async function getApprovalDigest(
   )
 }
 
+export async function getDelegateDigest(token: IntegralToken, newDelegate: string, expiry: number, nonce: number) {
+  const domainTypehash = await token.DOMAIN_TYPEHASH()
+  const delegationTypehash = await token.DELEGATION_TYPEHASH()
+  const abiCoder = new utils.AbiCoder()
+  const nameHash = utils.solidityKeccak256(['string'], [await token.name()])
+  const domainSeparator = utils.keccak256(
+    abiCoder.encode(
+      ['bytes32', 'bytes32', 'uint256', 'address'],
+      [domainTypehash, nameHash, await token.getChainId(), token.address]
+    )
+  )
+  const structHash = utils.solidityKeccak256(
+    ['bytes'],
+    [abiCoder.encode(['bytes32', 'address', 'uint256', 'uint256'], [delegationTypehash, newDelegate, nonce, expiry])]
+  )
+  return utils.solidityKeccak256(
+    ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+    ['0x19', '0x01', domainSeparator, structHash]
+  )
+}
+
+export function signDigest(wallet: Wallet, digest: string) {
+  const signingKey = new utils.SigningKey(wallet.privateKey)
+  return signingKey.signDigest(digest)
+}
+
 export async function mineBlock(wallet: Wallet) {
-  await wallet.sendTransaction({ to: constants.AddressZero, value: 1 })
+  return wallet.sendTransaction({ to: constants.AddressZero, value: 1 })
+}
+
+export async function mineBlocks(wallet: Wallet, n: number) {
+  for (let i = 0; i < n; i++) {
+    await mineBlock(wallet)
+  }
+}
+
+export function getFutureTime() {
+  return Date.now() + 1000000
 }
 
 export function encodePrice(reserve0: BigNumber, reserve1: BigNumber) {
@@ -117,4 +155,17 @@ export function getGasSpent(event: Event) {
 // function for 'OrderExecuted' event
 export function getEthRefund(event: Event) {
   return event.args?.[4]
+}
+
+export async function getTxGasUsed(tx: Promise<providers.TransactionResponse>) {
+  const receipt = await (await tx).wait()
+  return receipt.gasUsed
+}
+
+export async function getCurrentBlockNumber(wallet: Wallet) {
+  return await getTxBlockNumber(mineBlock(wallet))
+}
+
+export async function getTxBlockNumber(tx: providers.TransactionResponse | Promise<providers.TransactionResponse>) {
+  return (await (await tx).wait()).blockNumber
 }

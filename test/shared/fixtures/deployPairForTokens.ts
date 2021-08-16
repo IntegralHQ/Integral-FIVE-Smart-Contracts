@@ -2,11 +2,18 @@ import { Wallet, BigNumber, utils } from 'ethers'
 
 import { overrides } from '../utilities'
 
-import { IntegralOracle, IntegralPair__factory, IntegralFactory, IERC20, UnitOracle } from '../../../build/types'
+import {
+  IntegralOracle,
+  IntegralPair__factory,
+  IntegralFactory,
+  IERC20,
+  UnitOracle,
+  IntegralOracleV3,
+} from '../../../build/types'
 
 export async function deployPairForTokens(
   wallet: Wallet,
-  oracle: IntegralOracle | UnitOracle,
+  oracle: IntegralOracle | UnitOracle | IntegralOracleV3,
   factory: IntegralFactory,
   tokenA: IERC20,
   tokenB: IERC20

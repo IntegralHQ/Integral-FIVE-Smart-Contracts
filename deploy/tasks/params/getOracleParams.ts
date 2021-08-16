@@ -15,6 +15,15 @@ import wethWbtc from './curves/weth-wbtc.json'
 import linkWeth from './curves/link-weth.json'
 import wethLink from './curves/weth-link.json'
 
+import daiUsdc from './curves/dai-usdc.json'
+import usdcDai from './curves/usdc-dai.json'
+
+import daiUsdt from './curves/dai-usdt.json'
+import usdtDai from './curves/usdt-dai.json'
+
+import usdcUsdt from './curves/usdc-usdt.json'
+import usdtUsdc from './curves/usdt-usdc.json'
+
 export function getOracleParams(oracleName: string, token0Symbol: string) {
   switch (oracleName) {
     case 'weth-wbtc':
@@ -27,6 +36,12 @@ export function getOracleParams(oracleName: string, token0Symbol: string) {
       return token0Symbol === 'DAI' ? paramsToBigNumber(daiWeth) : paramsToBigNumber(wethDai)
     case 'weth-link':
       return token0Symbol === 'LINK' ? paramsToBigNumber(linkWeth) : paramsToBigNumber(wethLink)
+    case 'dai-usdc':
+      return token0Symbol === 'DAI' ? paramsToBigNumber(daiUsdc) : paramsToBigNumber(usdcDai)
+    case 'dai-usdt':
+      return token0Symbol === 'DAI' ? paramsToBigNumber(daiUsdt) : paramsToBigNumber(usdtDai)
+    case 'usdc-usdt':
+      return token0Symbol === 'USDC' ? paramsToBigNumber(usdcUsdt) : paramsToBigNumber(usdtUsdc)
     default:
       return parameters
   }
