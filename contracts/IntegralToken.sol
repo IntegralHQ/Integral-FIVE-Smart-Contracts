@@ -45,12 +45,10 @@ contract IntegralToken is IIntegralToken, Votes {
     mapping(address => uint256) public nonces;
     mapping(address => bool) public isBlacklisted;
 
-    bytes32 public constant DOMAIN_TYPEHASH = keccak256(
-        'EIP712Domain(string name,uint256 chainId,address verifyingContract)'
-    );
-    bytes32 public constant DELEGATION_TYPEHASH = keccak256(
-        'Delegation(address newDelegate,uint256 nonce,uint256 expiry)'
-    );
+    bytes32 public constant DOMAIN_TYPEHASH =
+        keccak256('EIP712Domain(string name,uint256 chainId,address verifyingContract)');
+    bytes32 public constant DELEGATION_TYPEHASH =
+        keccak256('Delegation(address newDelegate,uint256 nonce,uint256 expiry)');
 
     constructor(address account, uint256 _initialAmount) {
         owner = msg.sender;

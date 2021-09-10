@@ -18,18 +18,11 @@ contract IntegralStaking is IIntegralStaking, Votes {
     using TransferHelper for address;
 
     address public override owner;
-    address public override integralToken;
-    uint32 public override durationInBlocks;
+    address public immutable override integralToken;
+    uint32 public immutable override durationInBlocks;
     uint32 public override stopBlock;
-    uint32 public override ratePerBlockNumerator;
-    uint32 public override ratePerBlockDenominator;
-
-    struct UserStake {
-        uint32 startBlock;
-        uint32 claimedBlock;
-        uint96 lockedAmount;
-        bool withdrawn;
-    }
+    uint32 public immutable override ratePerBlockNumerator;
+    uint32 public immutable override ratePerBlockDenominator;
 
     mapping(address => UserStake[]) public userStakes;
 
@@ -44,6 +37,10 @@ contract IntegralStaking is IIntegralStaking, Votes {
         durationInBlocks = _durationInBlocks;
         ratePerBlockNumerator = _ratePerBlockNumerator;
         ratePerBlockDenominator = _ratePerBlockDenominator;
+    }
+
+    function getUserStakes(address _user) external view override returns (UserStake[] memory) {
+        return userStakes[_user];
     }
 
     function setOwner(address _owner) external override {
@@ -206,8 +203,8 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
         if (fromBlock < toBlock) {
             claimableAmount = userStake.lockedAmount.mul96(ratePerBlockNumerator).mul96(toBlock.sub32(fromBlock)).div96(
-                ratePerBlockDenominator
-            );
+                    ratePerBlockDenominator
+                );
         }
     }
 

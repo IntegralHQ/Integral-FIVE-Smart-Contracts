@@ -73,7 +73,6 @@ library TokenShares {
                 return data.totalShares[token] - lastShares;
             } else {
                 data.totalShares[token] = balanceAfter;
-                data.totalShares[token] = balanceAfter;
                 return balanceAfter;
             }
         }

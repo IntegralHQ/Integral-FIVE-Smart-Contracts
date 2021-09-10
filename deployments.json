@@ -48,7 +48,7 @@
     },
     "factory": "0xf656eb4f9f9f108e618Ede0022cD0E442cEfe833",
     "reader": "0x5a82eC7076a3Fb9Fc10e5D90e1cDA15372864c39",
-    "delay": "0x440C48003a5D3345514021D7D3a5141ECf7286Fd",
+    "delay": "0x6Ad48228c75B75Cb3ec8759dd33E28fE9fC711E5",
     "uniswap": {
       "factory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
       "weth-wbtc": "0xD43AC4C627F794d9f2702F3aE3B7972104E24C5D",
@@ -95,14 +95,15 @@
       "usdc-usdt": "0x47AfBe7aB54d15F49459677C126aaec6FD698d62"
     },
     "oraclesV3": {
-      "dai-usdc": "0x5c172A53FA7e3234d8aF3cEf9BBB29a3C832CE02",
-      "dai-usdt": "0x5C5DA00B2E8506bd6920132C28dae9f8Af257c38",
-      "usdc-usdt": "0x9e4C723A92659F300377B9658459896Ea5e256Bf"
+      "dai-usdc": "0x13e7a7ea8e3bAb55b217fe0a0643069481D05a3A",
+      "dai-usdt": "0xcfB84C8a2f400264F3163C60DB04FB2d5458fB58",
+      "usdc-usdt": "0x855D8c8e0bC0Fa521184b1f491d481957824376c"
     },
     "integralStaking": {
-      "sixMonths": "0xD0c2220F5aA156Bf37338C52BdB61219E8D41E0C",
-      "threeYears": "0x154590de021e85742739e5434171d045247642A0"
-    }
+      "sixMonths": "0xEa86F14DF7d6E775362847CcBeF4280E499c8B74",
+      "threeYears": "0x85F9ec6918A33C502D75a8f1fb8f2746FE87Bd98"
+    },
+    "priceReader": "0xB089726BEf3A9a6c336f2701fD630024DA534039"
   },
   "ropsten": {
     "owner": "0xFf030bEb0335432e156A0Ee55Bd87850eAaD228E",
@@ -202,6 +203,7 @@
       "dai-usdc": "0x70739a5450A5465ec435266D9131ABd1666d4274",
       "dai-usdt": "0xe95Fee72450Bac57ED45749c8c61829ecEA5d299",
       "usdc-usdt": "0x289596138E443A19fF0cA7486dbE7822E72fff16"
-    }
+    },
+    "priceReader": "0x75e4955dd2B608Eb7A821EefCbBacB5f9dC978AF"
   }
 }

@@ -15,8 +15,21 @@ library Orders {
     using TokenShares for TokenShares.Data;
     using TransferHelper for address;
 
-    enum OrderType { Empty, Deposit, Withdraw, Sell, Buy }
-    enum OrderStatus { NonExistent, EnqueuedWaiting, EnqueuedReady, ExecutedSucceeded, ExecutedFailed, Canceled }
+    enum OrderType {
+        Empty,
+        Deposit,
+        Withdraw,
+        Sell,
+        Buy
+    }
+    enum OrderStatus {
+        NonExistent,
+        EnqueuedWaiting,
+        EnqueuedReady,
+        ExecutedSucceeded,
+        ExecutedFailed,
+        Canceled
+    }
 
     event MaxGasLimitSet(uint256 maxGasLimit);
     event GasPriceInertiaSet(uint256 gasPriceInertia);

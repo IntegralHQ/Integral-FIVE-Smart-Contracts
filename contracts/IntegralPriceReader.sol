@@ -80,7 +80,7 @@ contract IntegralPriceReader {
 
     function _getPriceMultipliers(uint8 xDecimals, uint8 yDecimals)
         internal
-        view
+        pure
         returns (uint256 multiplier, uint256 divider)
     {
         if (xDecimals > yDecimals) {

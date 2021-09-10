@@ -12,6 +12,15 @@ interface IIntegralStaking {
     event ClaimAll(address user, uint96 amount, address to);
     event Claim(address user, uint256 stakeId, uint96 amount, address to);
 
+    struct UserStake {
+        uint32 startBlock;
+        uint32 claimedBlock;
+        uint96 lockedAmount;
+        bool withdrawn;
+    }
+
+    function getUserStakes(address _user) external view returns (UserStake[] memory);
+
     function owner() external view returns (address);
 
     function integralToken() external view returns (address);
