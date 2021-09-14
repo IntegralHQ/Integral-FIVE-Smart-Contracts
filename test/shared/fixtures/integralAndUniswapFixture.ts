@@ -22,9 +22,13 @@ export async function integralAndUniswapFixture([wallet]: Wallet[]) {
 
   const uniswapPair01 = await getOracleWithUniswapFixtureFor(18, 18)([wallet])
   await setupOracleWithUniswap(100, 400, 120, uniswapPair01)
-  const { token0, token1, pair: pair01 } = await deployPairForTokens(
+  const {
+    token0,
+    token1,
+    pair: pair01,
+  } = await deployPairForTokens(
     wallet,
-    uniswapPair01.oracle,
+    uniswapPair01.oracle.address,
     factory,
     uniswapPair01.token0,
     uniswapPair01.token1
@@ -32,9 +36,13 @@ export async function integralAndUniswapFixture([wallet]: Wallet[]) {
 
   const uniswapPair23 = await getOracleWithUniswapFixtureFor(18, 18)([wallet])
   await setupOracleWithUniswap(500, 200, 30, uniswapPair23)
-  const { token0: token2, token1: token3, pair: pair23 } = await deployPairForTokens(
+  const {
+    token0: token2,
+    token1: token3,
+    pair: pair23,
+  } = await deployPairForTokens(
     wallet,
-    uniswapPair23.oracle,
+    uniswapPair23.oracle.address,
     factory,
     uniswapPair23.token0,
     uniswapPair23.token1

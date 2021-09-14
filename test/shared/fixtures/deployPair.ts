@@ -8,5 +8,6 @@ export async function deployPair(wallet: Wallet, oracle: IntegralOracle | UnitOr
   const tokenA = await new ERC20__factory(wallet).deploy(expandTo18Decimals(1000000000000), overrides)
   const tokenB = await new ERC20__factory(wallet).deploy(expandTo18Decimals(1000000000000), overrides)
 
-  return deployPairForTokens(wallet, oracle, factory, tokenA, tokenB)
+  const pair = await deployPairForTokens(wallet, oracle.address, factory, tokenA, tokenB)
+  return { ...pair, oracle }
 }

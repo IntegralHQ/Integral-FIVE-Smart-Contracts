@@ -3,13 +3,13 @@ import { constants, utils } from 'ethers'
 
 import { setupFixtureLoader } from '../shared/setup'
 import { oracleFixture, getOracleFixtureFor } from '../shared/fixtures'
-import { IntegralOracle } from '../../build/types'
+import { OracleTest } from '../../build/types'
 
 describe('IntegralOracle.getSpotPrice', () => {
   const loadFixture = setupFixtureLoader()
 
   describe('getSpotPrice', () => {
-    async function testGetSpotPrice(oracle: IntegralOracle, xDecimals: number) {
+    async function testGetSpotPrice(oracle: OracleTest, xDecimals: number) {
       const price = utils.parseUnits('379.55')
       await oracle.setPrice(price)
 

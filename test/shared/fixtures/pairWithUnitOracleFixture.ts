@@ -10,5 +10,6 @@ import { deployPair } from './deployPair'
 export async function pairWithUnitOracleFixture([wallet]: Wallet[]) {
   const oracle = await new UnitOracle__factory(wallet).deploy(overrides)
   const { factory } = await factoryFixture([wallet])
-  return deployPair(wallet, oracle, factory)
+  const pair = await deployPair(wallet, oracle, factory)
+  return { ...pair, oracle }
 }

@@ -18,7 +18,7 @@ export async function priceReaderV2Fixture([wallet, other]: Wallet[]) {
   const { oracle: oracle23 } = await getOracleFixtureFor(18, 18)([wallet])
   const { token0: token2, token1: token3 } = await deployTokens(18, 18, wallet)
 
-  await deployPairForTokens(wallet, oracle23, factory, token2, token3)
+  await deployPairForTokens(wallet, oracle23.address, factory, token2, token3)
 
   const priceReader = await new IntegralPriceReader__factory(wallet).deploy(factory.address)
   return {

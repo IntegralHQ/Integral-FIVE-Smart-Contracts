@@ -4,7 +4,7 @@ import { constants, utils } from 'ethers'
 import { setupFixtureLoader } from '../shared/setup'
 import { oracleFixture, getOracleFixtureFor } from '../shared/fixtures'
 import { overrides } from '../shared/utilities'
-import { IntegralOracle } from '../../build/types'
+import { OracleTest } from '../../build/types'
 
 export function toDecimals(number: string, decimals: number) {
   const integer = number.split('.')[0]
@@ -16,7 +16,7 @@ export function toDecimals(number: string, decimals: number) {
 describe('IntegralOracle.trade', () => {
   const loadFixture = setupFixtureLoader()
 
-  async function testTradeX(oracle: IntegralOracle, xDecimals: number, yDecimals: number) {
+  async function testTradeX(oracle: OracleTest, xDecimals: number, yDecimals: number) {
     const price = utils.parseUnits('379.55')
     await oracle.setPrice(price, overrides)
 
@@ -35,7 +35,7 @@ describe('IntegralOracle.trade', () => {
     expect(await tradeX(150, 100, 1000000)).to.eq(toDecimals('981022.82041718542643052500', yDecimals))
   }
 
-  async function testTradeY(oracle: IntegralOracle, xDecimals: number, yDecimals: number) {
+  async function testTradeY(oracle: OracleTest, xDecimals: number, yDecimals: number) {
     const price = utils.parseUnits('379.55')
     await oracle.setPrice(price)
 

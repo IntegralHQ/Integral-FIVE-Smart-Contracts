@@ -172,7 +172,7 @@ describe('IntegralDelay.buy', () => {
 
     expect(orderType).to.equal(OrderType.Buy)
     expect(validAfterTimestamp).to.equal((await delay.delay()).add(timestamp))
-    expect([...result]).to.deep.equal([
+    expect([...result]).to.deep.eq([
       pairAddressToPairId(pair.address),
       false,
       buyRequest.amountInMax,

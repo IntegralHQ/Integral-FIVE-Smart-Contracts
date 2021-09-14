@@ -62,8 +62,8 @@ export async function integralAndUniswapV3Fixture([wallet]: Wallet[]) {
 
   const { factory } = await factoryFixture([wallet])
   const { delay } = await deployDelay(wallet, factory, weth)
-  const { pair: pair01 } = await deployPairForTokens(wallet, oracle01, factory, token0, token1)
-  const { pair: pair23 } = await deployPairForTokens(wallet, oracle23, factory, token2, token3)
+  const { pair: pair01 } = await deployPairForTokens(wallet, oracle01.address, factory, token0, token1)
+  const { pair: pair23 } = await deployPairForTokens(wallet, oracle23.address, factory, token2, token3)
   await setTokenTransferCosts(delay, [token0, token1, token2, token3])
 
   return {

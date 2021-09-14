@@ -89,7 +89,7 @@ contract IntegralToken is IIntegralToken, Votes {
         balances[to] = balances[to].add96(amount);
         emit Transfer(address(0), to, _amount);
 
-        _updateVotes(address(0), to, amount);
+        _updateVotes(address(0), getDelegate(to), amount);
     }
 
     function setBurner(address account, bool _isBurner) external {

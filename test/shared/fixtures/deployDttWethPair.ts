@@ -11,5 +11,6 @@ export async function deployDttWethPair(
   weth: WETH9
 ) {
   const dtt = await new DeflatingERC20__factory(wallet).deploy(expandTo18Decimals(10000), overrides)
-  return deployPairForTokens(wallet, oracle, factory, weth, dtt)
+  const pair = await deployPairForTokens(wallet, oracle.address, factory, weth, dtt)
+  return { ...pair, oracle }
 }

@@ -1,5 +1,5 @@
 import { BigNumber, constants, Contract, providers, utils, Wallet, BigNumberish } from 'ethers'
-import { IERC20, IntegralDelay } from '../../../build/types'
+import { DelayTest, IERC20 } from '../../../build/types'
 import { expandTo18Decimals, overrides } from '../utilities'
 
 export const getDefaultDeposit = (token0: IERC20, token1: IERC20, wallet: Wallet | Contract) => ({
@@ -23,7 +23,7 @@ export const getDefaultDeposit = (token0: IERC20, token1: IERC20, wallet: Wallet
 type DepositOverrides = Partial<ReturnType<typeof getDefaultDeposit>>
 
 export async function deposit(
-  delay: IntegralDelay,
+  delay: DelayTest,
   token0: IERC20,
   token1: IERC20,
   to: Wallet | Contract,
@@ -48,7 +48,7 @@ export async function deposit(
 }
 
 export async function depositAndWait(
-  delay: IntegralDelay,
+  delay: DelayTest,
   token0: IERC20,
   token1: IERC20,
   to: Wallet | Contract,

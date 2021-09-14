@@ -2,7 +2,6 @@ import { expect } from 'chai'
 import { setupFixtureLoader } from './shared/setup'
 import { priceReaderV2Fixture, priceReaderV3Fixture } from './shared/fixtures'
 import { BigNumber, constants } from 'ethers'
-import { getEvents } from './shared/utilities'
 
 const BN_NORMALIZER = BigNumber.from(10).pow(18)
 

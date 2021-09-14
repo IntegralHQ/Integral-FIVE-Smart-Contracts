@@ -18,5 +18,6 @@ export async function mixedDecimalsTokenPairFixture([wallet]: Wallet[]) {
   const { oracle } = await getOracleFixtureFor(8, 18)([wallet])
   const { factory } = await factoryFixture([wallet])
 
-  return deployPairForTokens(wallet, oracle, factory, eightDecimalsToken, token)
+  const pair = await deployPairForTokens(wallet, oracle.address, factory, eightDecimalsToken, token)
+  return { ...pair, oracle }
 }

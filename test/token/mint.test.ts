@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { constants } from 'ethers'
 import { tokenFixture } from '../shared/fixtures'
 import { setupFixtureLoader } from '../shared/setup'
-import { expandTo18Decimals, MAX_UINT_96 } from '../shared/utilities'
+import { expandTo18Decimals, MAX_UINT_96, overrides } from '../shared/utilities'
 
 describe('IntegralToken.mint', () => {
   const loadFixture = setupFixtureLoader()
@@ -64,5 +64,17 @@ describe('IntegralToken.mint', () => {
     const initialVotes = await token.getCurrentVotes(wallet.address)
     await token.mint(wallet.address, expandTo18Decimals(1))
     expect(await token.getCurrentVotes(wallet.address)).to.eq(initialVotes.add(expandTo18Decimals(1)))
+  })
+
+  it('can delegate votes after mint', async () => {
+    const { token, wallet, other, another } = await loadFixture(tokenFixture)
+    await token.delegate(other.address)
+    const delegatedVotes = await token.getCurrentVotes(other.address)
+
+    const mintedAmount = expandTo18Decimals(5)
+    await token.mint(wallet.address, mintedAmount)
+    await token.delegate(another.address, overrides)
+
+    expect(await token.getCurrentVotes(another.address)).to.equal(delegatedVotes.add(mintedAmount))
   })
 })

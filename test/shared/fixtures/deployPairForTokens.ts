@@ -2,24 +2,17 @@ import { Wallet, BigNumber, utils } from 'ethers'
 
 import { overrides } from '../utilities'
 
-import {
-  IntegralOracle,
-  IntegralPair__factory,
-  IntegralFactory,
-  IERC20,
-  UnitOracle,
-  IntegralOracleV3,
-} from '../../../build/types'
+import { IntegralPair__factory, IntegralFactory, IERC20 } from '../../../build/types'
 
 export async function deployPairForTokens(
   wallet: Wallet,
-  oracle: IntegralOracle | UnitOracle | IntegralOracleV3,
+  oracle: string,
   factory: IntegralFactory,
   tokenA: IERC20,
   tokenB: IERC20
 ) {
   const TRADER_ADDRESS = `0x${'f'.repeat(40)}` // TODO: get from parameters
-  await factory.createPair(tokenA.address, tokenB.address, oracle.address, TRADER_ADDRESS, overrides)
+  await factory.createPair(tokenA.address, tokenB.address, oracle, TRADER_ADDRESS, overrides)
   const pairAddress = await factory.getPair(tokenA.address, tokenB.address)
   const pair = IntegralPair__factory.connect(pairAddress, wallet)
 

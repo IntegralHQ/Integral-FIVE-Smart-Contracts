@@ -1,6 +1,6 @@
 import { Wallet, BigNumber } from 'ethers'
 import { deployContract } from 'ethereum-waffle'
-import { IUniswapV2Factory, IUniswapV2Pair__factory, ERC20__factory } from '../../../build/types'
+import { IUniswapV2Pair__factory, ERC20__factory, IUniswapV2Factory__factory } from '../../../build/types'
 import UniswapFactory from '../../uniswap/UniswapFactory.json'
 import { expandTo18Decimals, overrides } from '../utilities'
 import { getOracleFixtureFor } from './getOracleFixtureFor'
@@ -11,7 +11,8 @@ export function getOracleWithUniswapFixtureFor(xDecimals: number, yDecimals: num
     const tokenB = await new ERC20__factory(wallet).deploy(expandTo18Decimals(10000000), overrides)
 
     const { oracle } = await getOracleFixtureFor(xDecimals, yDecimals)([wallet])
-    const factory = (await deployContract(wallet, UniswapFactory, [wallet.address])) as IUniswapV2Factory
+    const factoryAsContract = await deployContract(wallet, UniswapFactory, [wallet.address])
+    const factory = IUniswapV2Factory__factory.connect(factoryAsContract.address, wallet)
     await factory.createPair(tokenA.address, tokenB.address, overrides)
     const pairAddress = await factory.getPair(tokenA.address, tokenB.address)
     const pair = IUniswapV2Pair__factory.connect(pairAddress, wallet)

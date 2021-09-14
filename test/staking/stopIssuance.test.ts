@@ -1,7 +1,7 @@
 import { setupFixtureLoader } from '../shared/setup'
 import { stakingFixture } from '../shared/fixtures'
 import { expect } from 'chai'
-import { expandTo18Decimals, mineBlock, mineBlocks } from '../shared/utilities'
+import { expandTo18Decimals, mineBlocks, overrides } from '../shared/utilities'
 
 describe('IntegralStaking.stopIssuance', () => {
   const loadFixture = setupFixtureLoader()
@@ -14,26 +14,27 @@ describe('IntegralStaking.stopIssuance', () => {
   })
 
   it('revert deposit after issuance stop', async () => {
-    const { wallet, provider, staking } = await loadFixture(stakingFixture)
+    const { wallet, staking } = await loadFixture(stakingFixture)
 
-    const stopBlock = (await provider.getBlockNumber()) + 1
+    const stopBlock = 5
     await expect(staking.stopIssuance(stopBlock)).to.emit(staking, 'StopIssuance').withArgs(stopBlock)
 
-    await mineBlock(wallet)
+    await mineBlocks(wallet, 2)
+
     await expect(staking.deposit(expandTo18Decimals(1))).to.be.revertedWith('IS_ALREADY_STOPPED')
   })
 
   it('same claimable amount after issuance stop', async () => {
-    const { provider, wallet, staking } = await loadFixture(stakingFixture)
+    const { wallet, staking } = await loadFixture(stakingFixture)
 
-    await staking.deposit(expandTo18Decimals(1))
+    await staking.deposit(expandTo18Decimals(1), overrides)
 
     await mineBlocks(wallet, 2)
 
     expect(await staking.getAllClaimable(wallet.address)).to.be.equal(expandTo18Decimals(0.02))
 
-    const stopBlock = (await provider.getBlockNumber()) + 1
-    await expect(staking.stopIssuance(stopBlock)).to.emit(staking, 'StopIssuance').withArgs(stopBlock)
+    const stopBlock = 8
+    await expect(staking.stopIssuance(stopBlock, overrides)).to.emit(staking, 'StopIssuance').withArgs(stopBlock)
 
     expect(await staking.getAllClaimable(wallet.address)).to.be.equal(expandTo18Decimals(0.03))
 
@@ -43,17 +44,17 @@ describe('IntegralStaking.stopIssuance', () => {
   })
 
   it('can withdraw after stop issuance', async () => {
-    const { provider, wallet, staking } = await loadFixture(stakingFixture)
+    const { wallet, staking } = await loadFixture(stakingFixture)
 
-    await staking.deposit(expandTo18Decimals(1))
+    await staking.deposit(expandTo18Decimals(1), overrides)
 
-    await expect(staking.withdraw(0, wallet.address)).to.be.revertedWith('IS_LOCKED')
+    await expect(staking.withdraw(0, wallet.address, overrides)).to.be.revertedWith('IS_LOCKED')
 
-    const stopBlock = (await provider.getBlockNumber()) + 1
-    await expect(staking.stopIssuance(stopBlock)).to.emit(staking, 'StopIssuance').withArgs(stopBlock)
+    const stopBlock = 8
+    await expect(staking.stopIssuance(stopBlock, overrides)).to.emit(staking, 'StopIssuance').withArgs(stopBlock)
 
     await mineBlocks(wallet, 1)
 
-    await staking.withdraw(0, wallet.address)
+    await staking.withdraw(0, wallet.address, overrides)
   })
 })

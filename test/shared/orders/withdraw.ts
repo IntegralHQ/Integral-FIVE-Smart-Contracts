@@ -1,5 +1,5 @@
 import { constants, Contract, providers, utils, Wallet, BigNumberish, BigNumber } from 'ethers'
-import { IERC20, IntegralDelay } from '../../../build/types'
+import { IERC20, DelayTest } from '../../../build/types'
 import { expandTo18Decimals, overrides } from '../utilities'
 
 export function getDefaultWithdraw(token0: IERC20, token1: IERC20, to: Wallet | Contract) {
@@ -21,7 +21,7 @@ export function getDefaultWithdraw(token0: IERC20, token1: IERC20, to: Wallet | 
 type WithdrawOverrides = Partial<ReturnType<typeof getDefaultWithdraw>>
 
 export async function withdraw(
-  delay: IntegralDelay,
+  delay: DelayTest,
   pair: IERC20,
   token0: IERC20,
   token1: IERC20,
@@ -42,7 +42,7 @@ export async function withdraw(
 }
 
 export async function withdrawAndWait(
-  delay: IntegralDelay,
+  delay: DelayTest,
   pair: IERC20,
   token0: IERC20,
   token1: IERC20,

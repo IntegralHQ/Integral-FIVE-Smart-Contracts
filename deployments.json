@@ -171,7 +171,7 @@
     "reader": "0xB2587B00f3EAef6037e70da7d0005B3fC6D353a3",
     "buyHelper": "0x1412524711D58c4927dE00446682AaBb3F33c6E5",
     "withdrawHelper": "0xb0abc66f199Fb295DC3F6e968e8bA0db03821102",
-    "integralToken": "0x5bC96017dcCacA53601d92125C5C6Db81d000Da5",
+    "integralToken": "0xD502F487e1841Fdc805130e13eae80c61186Bc98",
     "uniswapV3": {
       "factory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
       "dai-usdc": "0x6c6Bc977E13Df9b0de53b251522280BB72383700",

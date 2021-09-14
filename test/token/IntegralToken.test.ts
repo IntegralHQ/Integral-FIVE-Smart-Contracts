@@ -4,8 +4,9 @@ import { setupFixtureLoader } from '../shared/setup'
 import { expandTo18Decimals } from '../shared/utilities'
 
 describe('IntegralToken', () => {
+  type TokenProperty = 'name' | 'symbol' | 'decimals' | 'totalSupply'
   const loadFixture = setupFixtureLoader()
-  const testCases = [
+  const testCases: { property: TokenProperty; value: any }[] = [
     { property: 'name', value: 'Integral' },
     { property: 'symbol', value: 'ITGR' },
     { property: 'decimals', value: 18 },

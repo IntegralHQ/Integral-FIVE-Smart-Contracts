@@ -20,7 +20,7 @@ export async function deployWethPair(
   const weth = await new WETH9__factory(wallet).deploy(overrides)
   const token = await new ERC20__factory(wallet).deploy(expandTo18Decimals(10000), overrides)
 
-  const pair = await deployPairForTokens(wallet, oracle, factory, weth, token)
+  const pair = await deployPairForTokens(wallet, oracle.address, factory, weth, token)
 
   async function addLiquidityETH(tokenAmount: BigNumber, wethAmount: BigNumber) {
     await token.transfer(pair.pair.address, tokenAmount, overrides)
@@ -29,5 +29,5 @@ export async function deployWethPair(
     await pair.pair.mint(wallet.address, overrides)
   }
 
-  return { weth, token, ...pair, addLiquidityETH }
+  return { weth, token, ...pair, addLiquidityETH, oracle }
 }

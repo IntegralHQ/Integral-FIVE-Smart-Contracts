@@ -9,7 +9,7 @@ export async function delayFailingAndWethFixture([wallet]: Wallet[]) {
   const { oracle, factory, weth, delay } = await delayFixture([wallet])
   const failingToken = await new FailingERC20__factory(wallet).deploy(expandTo18Decimals(100000), overrides)
 
-  const { pair: wethPair } = await deployPairForTokens(wallet, oracle, factory, failingToken, weth)
+  const { pair: wethPair } = await deployPairForTokens(wallet, oracle.address, factory, failingToken, weth)
 
   async function addLiquidityETH(tokenAmount: BigNumber, wethAmount: BigNumber) {
     await failingToken.transfer(wethPair.address, tokenAmount, overrides)

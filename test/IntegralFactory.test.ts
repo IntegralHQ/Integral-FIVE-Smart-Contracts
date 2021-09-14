@@ -10,6 +10,17 @@ import { factoryWithOracleAndTokensFixture } from './shared/fixtures/factoryWith
 
 const TEST_TRADER = '0x1000000000000000000000000000000000000000'
 
+type FactoryFunction =
+  | 'setMintFee'
+  | 'setBurnFee'
+  | 'setSwapFee'
+  | 'setTrader'
+  | 'setToken0AbsoluteLimit'
+  | 'setToken1AbsoluteLimit'
+  | 'setToken0RelativeLimit'
+  | 'setToken1RelativeLimit'
+  | 'setPriceDeviationLimit'
+
 describe('IntegralFactory', () => {
   const loadFixture = setupFixtureLoader()
 
@@ -23,22 +34,20 @@ describe('IntegralFactory', () => {
     expect(await factory.allPairsLength()).to.eq(0)
   })
 
-  async function createPair(wallet: Wallet, factory: Contract, tokens: [string, string], oracle: Contract) {
+  async function createPair(wallet: Wallet, factory: Contract, tokens: [string, string], oracle: string) {
     const sortedTokens = BigNumber.from(tokens[0]).lt(BigNumber.from(tokens[1]))
       ? [tokens[0], tokens[1]]
       : [tokens[1], tokens[0]]
     const bytecode = `0x${IntegralPair.evm.bytecode.object}`
     const create2Address = getCreate2Address(factory.address, tokens, bytecode)
-    await expect(factory.createPair(...tokens, oracle.address, TEST_TRADER, overrides))
+    await expect(factory.createPair(...tokens, oracle, TEST_TRADER, overrides))
       .to.emit(factory, 'PairCreated')
       .withArgs(sortedTokens[0], sortedTokens[1], create2Address, BigNumber.from(1))
 
-    await expect(factory.createPair(...tokens, oracle.address, TEST_TRADER, overrides)).to.revertedWith(
+    await expect(factory.createPair(...tokens, oracle, TEST_TRADER, overrides)).to.revertedWith('IF_PAIR_EXISTS')
+    await expect(factory.createPair(...tokens.slice().reverse(), oracle, TEST_TRADER, overrides)).to.revertedWith(
       'IF_PAIR_EXISTS'
     )
-    await expect(
-      factory.createPair(...tokens.slice().reverse(), oracle.address, TEST_TRADER, overrides)
-    ).to.revertedWith('IF_PAIR_EXISTS')
 
     expect(await factory.getPair(...tokens)).to.eq(create2Address)
     expect(await factory.getPair(...tokens.slice().reverse())).to.eq(create2Address)
@@ -49,17 +58,17 @@ describe('IntegralFactory', () => {
     expect(await pair.factory()).to.eq(factory.address)
     expect(await pair.token0()).to.eq(sortedTokens[0])
     expect(await pair.token1()).to.eq(sortedTokens[1])
-    expect(await pair.oracle()).to.eq(oracle.address)
+    expect(await pair.oracle()).to.eq(oracle)
   }
 
   it('can create pairs', async () => {
     const { factory, oracle, token0, token1, wallet } = await loadFixture(factoryWithOracleAndTokensFixture)
-    await createPair(wallet, factory, [token0.address, token1.address], oracle)
+    await createPair(wallet, factory, [token0.address, token1.address], oracle.address)
   })
 
   it('can create pairs when the token addresses are reversed', async () => {
     const { factory, oracle, token0, token1, wallet } = await loadFixture(factoryWithOracleAndTokensFixture)
-    await createPair(wallet, factory, [token1.address, token0.address], oracle)
+    await createPair(wallet, factory, [token1.address, token0.address], oracle.address)
   })
 
   it('performs addresses checkings when creating pair', async () => {
@@ -158,29 +167,29 @@ describe('IntegralFactory', () => {
   })
 
   describe('pair setters', () => {
-    const setters: [string, ...any[]][] = [
-      ['setMintFee', 2000000],
-      ['setBurnFee', 2000000],
-      ['setSwapFee', 2000000],
+    const setters: [FactoryFunction, ...string[]][] = [
+      ['setMintFee', '2000000'],
+      ['setBurnFee', '2000000'],
+      ['setSwapFee', '2000000'],
       ['setTrader', Wallet.createRandom().address],
-      ['setToken0AbsoluteLimit', 10],
-      ['setToken1AbsoluteLimit', 10],
-      ['setToken0RelativeLimit', 10],
-      ['setToken1RelativeLimit', 10],
-      ['setPriceDeviationLimit', 10],
+      ['setToken0AbsoluteLimit', '10'],
+      ['setToken1AbsoluteLimit', '10'],
+      ['setToken0RelativeLimit', '10'],
+      ['setToken1RelativeLimit', '10'],
+      ['setPriceDeviationLimit', '10'],
     ]
 
-    for (const [method, ...params] of setters) {
+    for (const [method, param] of setters) {
       it(method, async () => {
         const { factory, oracle, token0, token1, wallet, other } = await loadFixture(factoryWithOracleAndTokensFixture)
         await expect(
-          factory.connect(other)[method](token0.address, token1.address, ...params, overrides)
+          factory.connect(other)[method](token0.address, token1.address, param, overrides)
         ).to.be.revertedWith('IF_FORBIDDEN')
-        await expect(factory[method](token0.address, token1.address, ...params, overrides)).to.be.revertedWith(
+        await expect(factory[method](token0.address, token1.address, param, overrides)).to.be.revertedWith(
           'IF_PAIR_DOES_NOT_EXIST'
         )
-        await createPair(wallet, factory, [token0.address, token1.address], oracle)
-        await factory[method](token0.address, token1.address, ...params, overrides)
+        await createPair(wallet, factory, [token0.address, token1.address], oracle.address)
+        await factory[method](token0.address, token1.address, param, overrides)
       })
     }
 
@@ -192,7 +201,7 @@ describe('IntegralFactory', () => {
       await expect(factory.setOracle(token0.address, token1.address, oracle.address, overrides)).to.be.revertedWith(
         'IF_PAIR_DOES_NOT_EXIST'
       )
-      await createPair(wallet, factory, [token0.address, token1.address], oracle)
+      await createPair(wallet, factory, [token0.address, token1.address], oracle.address)
       await factory.setOracle(token0.address, token1.address, oracle.address, overrides)
     })
   })

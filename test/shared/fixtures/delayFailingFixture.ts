@@ -12,7 +12,7 @@ export async function delayFailingFixture([wallet]: Wallet[]) {
   const { factory } = await factoryFixture([wallet])
   const tokenA = await new FailingERC20__factory(wallet).deploy(expandTo18Decimals(100000), overrides)
   const tokenB = await new FailingERC20__factory(wallet).deploy(expandTo18Decimals(100000), overrides)
-  const pair = await deployPairForTokens(wallet, oracle, factory, tokenA, tokenB)
+  const pair = await deployPairForTokens(wallet, oracle.address, factory, tokenA, tokenB)
   const { libraries, orders, tokenShares } = await deployLibraries(wallet)
   const delay = await new DelayTest__factory(libraries, wallet).deploy(
     pair.factory.address,
@@ -27,12 +27,12 @@ export async function delayFailingFixture([wallet]: Wallet[]) {
   async function deployAnotherPair() {
     const tokenA = await new FailingERC20__factory(wallet).deploy(expandTo18Decimals(100000), overrides)
     const tokenB = await new FailingERC20__factory(wallet).deploy(expandTo18Decimals(100000), overrides)
-    const pair = await deployPairForTokens(wallet, oracle, factory, tokenA, tokenB)
+    const pair = await deployPairForTokens(wallet, oracle.address, factory, tokenA, tokenB)
     const token2 = pair.token0 as FailingERC20
     const token3 = pair.token1 as FailingERC20
     await setTokenTransferCosts(delay, [token2, token3])
     return { token2, token3, addAnotherLiquidity: pair.addLiquidity }
   }
 
-  return { delay, ...pair, token0, token1, deployAnotherPair, orders, tokenShares }
+  return { delay, ...pair, token0, token1, deployAnotherPair, orders, tokenShares, oracle }
 }
