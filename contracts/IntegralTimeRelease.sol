@@ -82,15 +82,18 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         require(msg.sender == owner, 'TR_FORBIDDEN');
         require(option1StopSetBlock == option1EndBlock, 'TR_STOP_ALREADY_SET');
         require(wallets.length == amounts.length, 'TR_INVALID_LENGTHS');
+        uint32 initBlock = safe32(block.number);
+        uint96 total = 0;
         for (uint256 i = 0; i < wallets.length; i++) {
             address wallet = wallets[i];
             require(option1[wallet].allocation == 0, 'TR_ALLOCATION_ALREADY_SET');
             uint96 amount = amounts[i];
             require(amount > 0, 'TR_ALLOCATION_ZERO');
             option1[wallet].allocation = amount;
-            option1[wallet].initBlock = safe32(block.number);
-            option1TotalAllocations = option1TotalAllocations.add96(amount);
+            option1[wallet].initBlock = initBlock;
+            total = total.add96(amount);
         }
+        option1TotalAllocations = option1TotalAllocations.add96(total);
         require(IERC20(token).balanceOf(address(this)) >= getTokensLeft(), 'TR_INSUFFICIENT_BALANCE');
     }
 
@@ -98,15 +101,18 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         require(msg.sender == owner, 'TR_FORBIDDEN');
         require(option2StopSetBlock == option2EndBlock, 'TR_STOP_ALREADY_SET');
         require(wallets.length == amounts.length, 'TR_INVALID_LENGTHS');
+        uint32 initBlock = safe32(block.number);
+        uint96 total = 0;
         for (uint256 i = 0; i < wallets.length; i++) {
             address wallet = wallets[i];
             require(option2[wallet].allocation == 0, 'TR_ALLOCATION_ALREADY_SET');
             uint96 amount = amounts[i];
             require(amount > 0, 'TR_ALLOCATION_ZERO');
             option2[wallet].allocation = amount;
-            option2[wallet].initBlock = safe32(block.number);
-            option2TotalAllocations = option2TotalAllocations.add96(amount);
+            option2[wallet].initBlock = initBlock;
+            total = total.add96(amount);
         }
+        option2TotalAllocations = option2TotalAllocations.add96(total);
         require(IERC20(token).balanceOf(address(this)) >= getTokensLeft(), 'TR_INSUFFICIENT_BALANCE');
     }
 
@@ -186,12 +192,12 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         require(msg.sender == owner, 'TR_FORBIDDEN');
         require(to != address(0), 'TR_ADDRESS_ZERO');
 
-        uint256 amount = getExcessedTokens();
+        uint256 amount = getExcessTokens();
         TransferHelper.safeTransfer(token, to, amount);
         emit Skim(to, amount);
     }
 
-    function getExcessedTokens() public view returns (uint256) {
+    function getExcessTokens() public view returns (uint256) {
         return IERC20(token).balanceOf(address(this)).sub(getTokensLeft());
     }
 
@@ -274,7 +280,7 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         return uint96(n);
     }
 
-    function getPriorVotes(address account, uint256 blockNumber) public view returns (uint96) {
+    function getPriorVotes(address account, uint256 blockNumber) external view returns (uint96) {
         uint96 option1TotalAllocation = option1[account].allocation;
         uint96 option2TotalAllocation = option2[account].allocation;
 
