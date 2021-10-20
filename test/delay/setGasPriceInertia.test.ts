@@ -14,12 +14,12 @@ describe('IntegralDelay.setGasPriceInertia', () => {
 
   it('cannot be set to 0', async () => {
     const { delay } = await loadFixture(delayFixture)
-    await expect(delay.setGasPriceInertia(0)).to.be.revertedWith('OS_INVALID_INERTIA')
+    await expect(delay.setGasPriceInertia(0, overrides)).to.be.revertedWith('OS_INVALID_INERTIA')
   })
 
   it('can be changed', async () => {
     const { delay, other } = await loadFixture(delayFixture)
-    await expect(delay.connect(other.address).setGasPriceInertia(1_000_000)).to.be.revertedWith('ID_FORBIDDEN')
+    await expect(delay.connect(other).setGasPriceInertia(1_000_000, overrides)).to.be.revertedWith('ID_FORBIDDEN')
 
     await expect(delay.setGasPriceInertia(1_000_000, overrides))
       .to.emit(delay, 'GasPriceInertiaSet')

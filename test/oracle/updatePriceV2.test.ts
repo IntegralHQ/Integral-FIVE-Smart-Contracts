@@ -25,9 +25,9 @@ describe('IntegralOracleV2.updatePrice', () => {
 
         await addLiquidity(expandToDecimals(xSupply, xDecimals), expandToDecimals(ySupply, yDecimals))
         await provider.send('evm_increaseTime', [1])
-        await pair.sync()
+        await pair.sync(overrides)
 
-        await oracle.setUniswapPair(pair.address)
+        await oracle.setUniswapPair(pair.address, overrides)
         await oracle.updatePrice(overrides)
         await provider.send('evm_increaseTime', [1000000])
         await oracle.updatePrice(overrides)
@@ -46,15 +46,15 @@ describe('IntegralOracleV2.updatePrice', () => {
     const { pair, addLiquidity, oracle, provider, wallet, token1 } = await loadFixture(oracleWithUniswapFixture)
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(50_000))
     await provider.send('evm_increaseTime', [1])
-    await pair.sync()
+    await pair.sync(overrides)
 
-    await oracle.setUniswapPair(pair.address)
+    await oracle.setUniswapPair(pair.address, overrides)
     await oracle.updatePrice(overrides)
     const price = await oracle.price()
 
     await provider.send('evm_increaseTime', [1])
     await token1.transfer(pair.address, expandTo18Decimals(500))
-    await pair.swap(expandTo18Decimals(0.8), 0, wallet.address, [])
+    await pair.swap(expandTo18Decimals(0.8), 0, wallet.address, [], overrides)
 
     await oracle.updatePrice(overrides)
     const price2 = await oracle.price()

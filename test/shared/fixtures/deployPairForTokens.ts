@@ -44,9 +44,9 @@ export async function deployPairForTokens(
   const PRECISION: BigNumber = utils.parseUnits('1')
 
   // Set specific fees for testing, ignoring defaults. Each fee is different to prevent errors
-  await factory.setMintFee(token0.address, token1.address, utils.parseUnits('0.001'))
-  await factory.setBurnFee(token0.address, token1.address, utils.parseUnits('0.002'))
-  await factory.setSwapFee(token0.address, token1.address, utils.parseUnits('0.003'))
+  await factory.setMintFee(token0.address, token1.address, utils.parseUnits('0.001'), overrides)
+  await factory.setBurnFee(token0.address, token1.address, utils.parseUnits('0.002'), overrides)
+  await factory.setSwapFee(token0.address, token1.address, utils.parseUnits('0.003'), overrides)
 
   const SWAP_FEE: BigNumber = await pair.swapFee()
   const SWAP_FEE_N = parseFloat(utils.formatUnits(SWAP_FEE))

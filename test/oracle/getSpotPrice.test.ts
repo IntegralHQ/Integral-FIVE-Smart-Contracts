@@ -4,6 +4,7 @@ import { constants, utils } from 'ethers'
 import { setupFixtureLoader } from '../shared/setup'
 import { oracleFixture, getOracleFixtureFor } from '../shared/fixtures'
 import { OracleTest } from '../../build/types'
+import { overrides } from '../shared/utilities'
 
 describe('IntegralOracle.getSpotPrice', () => {
   const loadFixture = setupFixtureLoader()
@@ -11,7 +12,7 @@ describe('IntegralOracle.getSpotPrice', () => {
   describe('getSpotPrice', () => {
     async function testGetSpotPrice(oracle: OracleTest, xDecimals: number) {
       const price = utils.parseUnits('379.55')
-      await oracle.setPrice(price)
+      await oracle.setPrice(price, overrides)
 
       function getSpotPrice(xCurrent: number, xBefore: number) {
         return oracle.getSpotPrice(

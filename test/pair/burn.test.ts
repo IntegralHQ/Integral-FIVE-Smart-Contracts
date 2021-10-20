@@ -67,15 +67,15 @@ describe('IntegralPair.burn', () => {
     const token1Amount = expandTo18Decimals(500)
     await addLiquidity(token0Amount, token1Amount)
 
-    await oracle.updateEpoch()
+    await oracle.updateEpoch(overrides)
 
-    await token0.transfer(pair.address, expandTo18Decimals(50))
+    await token0.transfer(pair.address, expandTo18Decimals(50), overrides)
     const swapFee = expandTo18Decimals(50).mul(SWAP_FEE).div(PRECISION)
-    await pair.swap(0, expandTo18Decimals(50).sub(swapFee), wallet.address)
+    await pair.swap(0, expandTo18Decimals(50).sub(swapFee), wallet.address, overrides)
 
     const beforeState = await getState()
-    await pair.transfer(pair.address, expandTo18Decimals(100))
-    await pair.burn(wallet.address)
+    await pair.transfer(pair.address, expandTo18Decimals(100), overrides)
+    await pair.burn(wallet.address, overrides)
     const afterState = await getState()
 
     const burnFee = expandTo18Decimals(100).mul(BURN_FEE).div(PRECISION)

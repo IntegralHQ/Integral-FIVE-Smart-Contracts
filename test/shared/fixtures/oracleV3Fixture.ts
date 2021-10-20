@@ -14,9 +14,9 @@ export async function oracleV3Fixture([wallet]: Wallet[]) {
 
   async function getInvalidDecimalsPool() {
     const anotherToken = await new CustomERC20__factory(wallet).deploy('Another token', 'ATKN', 6, 1000, overrides)
-    return new UniswapV3PoolTest__factory(wallet).deploy(1000, token0.address, anotherToken.address)
+    return new UniswapV3PoolTest__factory(wallet).deploy(1000, token0.address, anotherToken.address, overrides)
   }
 
-  const pool = await new UniswapV3PoolTest__factory(wallet).deploy(1000, token0.address, token1.address)
+  const pool = await new UniswapV3PoolTest__factory(wallet).deploy(1000, token0.address, token1.address, overrides)
   return { oracle, pool, getEmptyPool, getInvalidDecimalsPool }
 }

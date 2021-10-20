@@ -47,7 +47,7 @@ describe('IntegralDelay.withdraw', () => {
       const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
       withdrawRequest.gasLimit = 160001
 
-      await delay.setMaxGasLimit(160000)
+      await delay.setMaxGasLimit(160000, overrides)
       await expect(delay.withdraw(withdrawRequest, overrides)).to.revertedWith('OS_GAS_LIMIT_TOO_HIGH')
     })
 
@@ -62,7 +62,7 @@ describe('IntegralDelay.withdraw', () => {
       const { delay, token0, token1, wallet } = await loadFixture(delayFixture)
       const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
 
-      await delay.setGasPrice(100)
+      await delay.setGasPrice(100, overrides)
       await expect(delay.withdraw(withdrawRequest, overrides)).to.revertedWith('OS_NOT_ENOUGH_FUNDS')
     })
 
@@ -71,7 +71,7 @@ describe('IntegralDelay.withdraw', () => {
       const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
 
       const gasPrice = 100
-      await delay.setGasPrice(gasPrice)
+      await delay.setGasPrice(gasPrice, overrides)
       await expect(
         delay.withdraw(withdrawRequest, {
           ...overrides,
@@ -91,7 +91,7 @@ describe('IntegralDelay.withdraw', () => {
 
     it('reverts when withdraw is disabled', async () => {
       const { delay, token0, token1, wallet, pair } = await loadFixture(delayFixture)
-      await delay.setOrderDisabled(pair.address, OrderType.Withdraw, true)
+      await delay.setOrderDisabled(pair.address, OrderType.Withdraw, true, overrides)
       const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
       await expect(delay.withdraw(withdrawRequest, overrides)).to.revertedWith('OS_WITHDRAW_DISABLED')
 
@@ -106,12 +106,12 @@ describe('IntegralDelay.withdraw', () => {
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
     const gasPrice = utils.parseUnits('69.420', 'gwei')
     const excess = 12345
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
     const value = gasPrice.mul(withdrawRequest.gasLimit)
 
-    await pair.approve(delay.address, constants.MaxUint256)
+    await pair.approve(delay.address, constants.MaxUint256, overrides)
 
     const balanceBefore = await wallet.getBalance()
     const delayBalanceBefore = await wallet.provider.getBalance(delay.address)
@@ -135,7 +135,7 @@ describe('IntegralDelay.withdraw', () => {
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
 
     const gasPrice = utils.parseUnits('69.420', 'gwei')
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
 
@@ -162,7 +162,7 @@ describe('IntegralDelay.withdraw', () => {
 
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
     const gasPrice = utils.parseUnits('69.420', 'gwei')
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
 
@@ -239,7 +239,7 @@ describe('IntegralDelay.withdraw', () => {
     const withdrawRequest = getDefaultWithdraw(token0, token1, wallet)
 
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-    await pair.transfer(orderIdTest.address, utils.parseEther('1'))
+    await pair.transfer(orderIdTest.address, utils.parseEther('1'), overrides)
     await orderIdTest.approve(pair.address, delay.address, constants.MaxUint256, overrides)
 
     await expect(

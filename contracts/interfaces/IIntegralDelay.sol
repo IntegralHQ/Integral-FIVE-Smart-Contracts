@@ -92,4 +92,8 @@ interface IIntegralDelay {
     function buy(Orders.BuyParams memory buyParams) external payable returns (uint256 orderId);
 
     function execute(uint256 n) external;
+
+    function retryRefund(uint256 orderId) external;
+
+    function cancelOrder(uint256 orderId) external;
 }

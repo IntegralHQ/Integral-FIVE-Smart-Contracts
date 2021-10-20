@@ -25,7 +25,7 @@ describe('IntegralPair.getSwapAmount1In', () => {
 
       await addLiquidity(expandTo18Decimals(reserve0), expandTo18Decimals(reserve1))
       await oracle.setPrice(expandTo18Decimals(price), overrides)
-      await pair.syncWithOracle()
+      await pair.syncWithOracle(overrides)
 
       const amount1In = await pair.getSwapAmount1In(amountOut)
 
@@ -53,7 +53,7 @@ describe('IntegralPair.getSwapAmount1In', () => {
     expect(before.references[0]).to.eq(expandTo18Decimals(100))
     expect(before.references[1]).to.eq(expandTo18Decimals(2137))
 
-    await token1.transfer(pair.address, expectedInputAmount)
+    await token1.transfer(pair.address, expectedInputAmount, overrides)
     await pair.swap(outputAmount, 0, wallet.address, overrides)
 
     const outputAmount2 = expandTo18Decimals(1)

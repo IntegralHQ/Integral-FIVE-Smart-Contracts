@@ -16,8 +16,8 @@ describe('IntegralPair.sync', () => {
     expect(state0.references[0]).to.eq(0)
     expect(state0.references[1]).to.eq(0)
 
-    await token0.setBalance(pair.address, 1234)
-    await token1.setBalance(pair.address, 5678)
+    await token0.setBalance(pair.address, 1234, overrides)
+    await token1.setBalance(pair.address, 5678, overrides)
     await pair.sync(overrides)
 
     const state1 = await getState()
@@ -26,8 +26,8 @@ describe('IntegralPair.sync', () => {
     expect(state1.references[0]).to.eq(1234)
     expect(state1.references[1]).to.eq(5678)
 
-    await token0.setBalance(pair.address, 5678)
-    await token1.setBalance(pair.address, 1234)
+    await token0.setBalance(pair.address, 5678, overrides)
+    await token1.setBalance(pair.address, 1234, overrides)
     await pair.sync(overrides)
 
     const state2 = await getState()
@@ -49,8 +49,8 @@ describe('IntegralPair.sync', () => {
     const { pair, factory, addLiquidity } = await loadFixture(pairFixture)
 
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-    await pair.transfer(pair.address, expandTo18Decimals(10))
-    await pair.sync()
+    await pair.transfer(pair.address, expandTo18Decimals(10), overrides)
+    await pair.sync(overrides)
 
     const balance = await pair.balanceOf(factory.address)
     expect(balance.gt(expandTo18Decimals(10))).to.be.true
@@ -64,10 +64,10 @@ describe('IntegralPair.sync', () => {
       const state0 = await getState()
       expect(state0.fees[0]).to.eq(0)
       expect(state0.fees[1]).to.eq(0)
-      await token0.setBalance(reservesTest.address, 1000)
-      await token1.setBalance(reservesTest.address, 2000)
+      await token0.setBalance(reservesTest.address, 1000, overrides)
+      await token1.setBalance(reservesTest.address, 2000, overrides)
       await reservesTest.testAddFees(100, 200, overrides)
-      await reservesTest.testAdjustReserves()
+      await reservesTest.testAdjustReserves(overrides)
       await reservesTest.testSyncReserves(overrides)
 
       const state1 = await getState()
@@ -81,14 +81,14 @@ describe('IntegralPair.sync', () => {
 
     it('decrease balance', async () => {
       const { token0, token1, reservesTest, getState } = await loadFixture(reservesTestFixture)
-      await token0.setBalance(reservesTest.address, 1000)
-      await token1.setBalance(reservesTest.address, 2000)
+      await token0.setBalance(reservesTest.address, 1000, overrides)
+      await token1.setBalance(reservesTest.address, 2000, overrides)
       await reservesTest.testAddFees(100, 200, overrides)
-      await reservesTest.testAdjustReserves()
+      await reservesTest.testAdjustReserves(overrides)
       await reservesTest.testSyncReserves(overrides)
 
-      await token0.setBalance(reservesTest.address, 100)
-      await token1.setBalance(reservesTest.address, 200)
+      await token0.setBalance(reservesTest.address, 100, overrides)
+      await token1.setBalance(reservesTest.address, 200, overrides)
       await reservesTest.testSyncReserves(overrides)
 
       const state = await getState()
@@ -103,14 +103,14 @@ describe('IntegralPair.sync', () => {
     it('fees will change if balance increase', async () => {
       const { token0, token1, reservesTest, getState } = await loadFixture(reservesTestFixture)
 
-      await token0.setBalance(reservesTest.address, 100)
-      await token1.setBalance(reservesTest.address, 200)
+      await token0.setBalance(reservesTest.address, 100, overrides)
+      await token1.setBalance(reservesTest.address, 200, overrides)
       await reservesTest.testAddFees(10, 20, overrides)
-      await reservesTest.testAdjustReserves()
+      await reservesTest.testAdjustReserves(overrides)
       await reservesTest.testSyncReserves(overrides)
 
-      await token0.setBalance(reservesTest.address, 1000)
-      await token1.setBalance(reservesTest.address, 2000)
+      await token0.setBalance(reservesTest.address, 1000, overrides)
+      await token1.setBalance(reservesTest.address, 2000, overrides)
       await reservesTest.testSyncReserves(overrides)
 
       const state = await getState()

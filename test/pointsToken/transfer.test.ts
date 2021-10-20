@@ -22,14 +22,14 @@ describe('IntegralPointsToken.transfer', () => {
   it('changes to balance', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await token.transfer(other.address, amount)
+    await token.transfer(other.address, amount, overrides)
     expect(await token.balanceOf(other.address)).to.eq(amount)
   })
 
   it('emits event', async () => {
     const { token, wallet, other } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await expect(token.transfer(other.address, amount))
+    await expect(token.transfer(other.address, amount, overrides))
       .to.emit(token, 'Transfer')
       .withArgs(wallet.address, other.address, amount)
   })

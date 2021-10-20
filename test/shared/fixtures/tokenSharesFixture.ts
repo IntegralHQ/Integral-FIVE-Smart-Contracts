@@ -9,7 +9,7 @@ export async function tokenSharesFixture([wallet]: Wallet[]) {
   const tokenSharesTest = await new TokenSharesTest__factory(
     { 'contracts/libraries/TokenShares.sol:TokenShares': tokenShares.address },
     wallet
-  ).deploy(weth.address)
+  ).deploy(weth.address, overrides)
   const adjustableErc20 = await new AdjustableERC20__factory(wallet).deploy(expandTo18Decimals(1000), overrides)
 
   await adjustableErc20.approve(tokenSharesTest.address, constants.MaxUint256, overrides)

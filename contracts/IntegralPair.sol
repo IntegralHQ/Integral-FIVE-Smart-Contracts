@@ -309,7 +309,7 @@ contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
         }
     }
 
-    function sync() public override lock {
+    function sync() external override lock {
         require(canTrade(msg.sender), 'IP_UNAUTHORIZED_TRADER');
         _sync();
     }
@@ -348,7 +348,7 @@ contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
         return IIntegralOracle(oracle).getSpotPrice(reserve0, reference0);
     }
 
-    function getSwapAmount0In(uint256 amount1Out) public view override returns (uint256 swapAmount0In) {
+    function getSwapAmount0In(uint256 amount1Out) external view override returns (uint256 swapAmount0In) {
         (uint112 reserve0, uint112 reserve1, ) = getReserves();
         (uint112 reference0, uint112 reference1, ) = getReferences();
         uint256 balance1After = uint256(reserve1).sub(amount1Out);
@@ -356,7 +356,7 @@ contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
         return balance0After.sub(uint256(reserve0)).mul(TRADE_MOE).div(PRECISION.sub(swapFee));
     }
 
-    function getSwapAmount1In(uint256 amount0Out) public view override returns (uint256 swapAmount1In) {
+    function getSwapAmount1In(uint256 amount0Out) external view override returns (uint256 swapAmount1In) {
         (uint112 reserve0, uint112 reserve1, ) = getReserves();
         (uint112 reference0, uint112 reference1, ) = getReferences();
         uint256 balance0After = uint256(reserve0).sub(amount0Out);
@@ -364,7 +364,7 @@ contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
         return balance1After.sub(uint256(reserve1)).mul(TRADE_MOE).div(PRECISION.sub(swapFee));
     }
 
-    function getSwapAmount0Out(uint256 amount1In) public view override returns (uint256 swapAmount0Out) {
+    function getSwapAmount0Out(uint256 amount1In) external view override returns (uint256 swapAmount0Out) {
         (uint112 reserve0, uint112 reserve1, ) = getReserves();
         (uint112 reference0, uint112 reference1, ) = getReferences();
         uint256 fee = amount1In.mul(swapFee).div(PRECISION);
@@ -376,7 +376,7 @@ contract IntegralPair is Reserves, IntegralLPToken, IIntegralPair {
         return uint256(reserve0).sub(balance0After);
     }
 
-    function getSwapAmount1Out(uint256 amount0In) public view override returns (uint256 swapAmount1Out) {
+    function getSwapAmount1Out(uint256 amount0In) external view override returns (uint256 swapAmount1Out) {
         (uint112 reserve0, uint112 reserve1, ) = getReserves();
         (uint112 reference0, uint112 reference1, ) = getReferences();
         uint256 fee = amount0In.mul(swapFee).div(PRECISION);

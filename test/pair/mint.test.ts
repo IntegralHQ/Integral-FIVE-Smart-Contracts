@@ -50,12 +50,12 @@ describe('IntegralPair.mint', () => {
     )
 
     await addLiquidity(expandTo18Decimals(500), expandTo18Decimals(500))
-    await oracle.updateEpoch()
+    await oracle.updateEpoch(overrides)
 
-    await token0.transfer(pair.address, expandTo18Decimals(50))
+    await token0.transfer(pair.address, expandTo18Decimals(50), overrides)
     const swapFee = expandTo18Decimals(50 * SWAP_FEE_N)
     const swapOutput = 50 * (1 - SWAP_FEE_N)
-    await pair.swap(0, expandTo18Decimals(swapOutput), wallet.address)
+    await pair.swap(0, expandTo18Decimals(swapOutput), wallet.address, overrides)
 
     const amount0 = 550 * 0.2
     const amount1 = (500 - swapOutput) * 0.2

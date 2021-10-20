@@ -12,8 +12,8 @@ describe('IntegralDelay.retryRefund', () => {
   it('reverts for unfailed orders', async () => {
     const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFixture)
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-    await token0.transfer(other.address, expandTo18Decimals(10))
-    await token1.transfer(other.address, expandTo18Decimals(10))
+    await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+    await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
     await depositAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
     const tx = await delay.execute(1, overrides)
@@ -28,14 +28,14 @@ describe('IntegralDelay.retryRefund', () => {
   it('refunds tokens', async () => {
     const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFailingFixture)
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-    await token0.transfer(other.address, expandTo18Decimals(10))
-    await token1.transfer(other.address, expandTo18Decimals(10))
+    await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+    await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
     const token0InitialBalance = await token0.balanceOf(other.address)
     const token1InitialBalance = await token1.balanceOf(other.address)
     const deposit = await depositAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
-    await token0.setWasteTransferGas(true)
+    await token0.setWasteTransferGas(true, overrides)
     const tx = await delay.execute(1, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))
@@ -47,7 +47,7 @@ describe('IntegralDelay.retryRefund', () => {
       .withArgs(deposit.to, token1.address, deposit.amount1, encodeErrorData('TH_TRANSFER_FAILED'))
     expect(await token0.balanceOf(other.address)).to.lt(token0InitialBalance)
 
-    await token0.setWasteTransferGas(false)
+    await token0.setWasteTransferGas(false, overrides)
 
     await delay.retryRefund(1, overrides)
 

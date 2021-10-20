@@ -4,7 +4,7 @@ import { delayFixture } from './delayFixture'
 import { deposit, sell } from '../orders'
 import { pairFixture } from './pairFixture'
 import { OrderTypes } from '../../../scripts/utils'
-import { mineBlock } from '../utilities'
+import { mineBlock, overrides } from '../utilities'
 
 export async function botFixture([wallet]: Wallet[]) {
   const { delay, token0, token1 } = await delayFixture([wallet])
@@ -30,7 +30,7 @@ export async function botFixture([wallet]: Wallet[]) {
     await mineBlock(wallet)
   }
 
-  const multicall = await new Multicall__factory(wallet).deploy()
+  const multicall = await new Multicall__factory(wallet).deploy(overrides)
   const emptyWallet = new Wallet(Wallet.createRandom().privateKey, wallet.provider)
 
   return { delay, multicall, addOrders, increaseTime, emptyWallet }

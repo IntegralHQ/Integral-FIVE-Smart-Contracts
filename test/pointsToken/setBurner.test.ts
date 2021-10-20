@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { pointsTokenFixture } from '../shared/fixtures'
 import { setupFixtureLoader } from '../shared/setup'
+import { overrides } from '../shared/utilities'
 
 describe('IntegralPointsToken.setBurner', () => {
   const loadFixture = setupFixtureLoader()
@@ -18,9 +19,9 @@ describe('IntegralPointsToken.setBurner', () => {
   it('can set burner', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
     expect(await token.isBurner(other.address)).to.be.false
-    await token.setBurner(other.address, true)
+    await token.setBurner(other.address, true, overrides)
     expect(await token.isBurner(other.address)).to.be.true
-    await token.setBurner(other.address, false)
+    await token.setBurner(other.address, false, overrides)
     expect(await token.isBurner(other.address)).to.be.false
   })
 

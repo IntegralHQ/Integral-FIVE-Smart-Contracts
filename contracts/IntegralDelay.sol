@@ -48,43 +48,43 @@ contract IntegralDelay is IIntegralDelay {
         orders.maxGasPriceImpact = 1000000;
     }
 
-    function getTransferGasCost(address token) public view override returns (uint256 gasCost) {
+    function getTransferGasCost(address token) external view override returns (uint256 gasCost) {
         return orders.transferGasCosts[token];
     }
 
-    function getDepositOrder(uint256 orderId) public view override returns (Orders.DepositOrder memory order) {
+    function getDepositOrder(uint256 orderId) external view override returns (Orders.DepositOrder memory order) {
         return orders.getDepositOrder(orderId);
     }
 
-    function getWithdrawOrder(uint256 orderId) public view override returns (Orders.WithdrawOrder memory order) {
+    function getWithdrawOrder(uint256 orderId) external view override returns (Orders.WithdrawOrder memory order) {
         return orders.getWithdrawOrder(orderId);
     }
 
-    function getSellOrder(uint256 orderId) public view override returns (Orders.SellOrder memory order) {
+    function getSellOrder(uint256 orderId) external view override returns (Orders.SellOrder memory order) {
         return orders.getSellOrder(orderId);
     }
 
-    function getBuyOrder(uint256 orderId) public view override returns (Orders.BuyOrder memory order) {
+    function getBuyOrder(uint256 orderId) external view override returns (Orders.BuyOrder memory order) {
         return orders.getBuyOrder(orderId);
     }
 
-    function getDepositDisabled(address pair) public view override returns (bool) {
+    function getDepositDisabled(address pair) external view override returns (bool) {
         return orders.depositDisabled[pair];
     }
 
-    function getWithdrawDisabled(address pair) public view override returns (bool) {
+    function getWithdrawDisabled(address pair) external view override returns (bool) {
         return orders.withdrawDisabled[pair];
     }
 
-    function getBuyDisabled(address pair) public view override returns (bool) {
+    function getBuyDisabled(address pair) external view override returns (bool) {
         return orders.buyDisabled[pair];
     }
 
-    function getSellDisabled(address pair) public view override returns (bool) {
+    function getSellDisabled(address pair) external view override returns (bool) {
         return orders.sellDisabled[pair];
     }
 
-    function getOrderStatus(uint256 orderId) public view override returns (Orders.OrderStatus) {
+    function getOrderStatus(uint256 orderId) external view override returns (Orders.OrderStatus) {
         return orders.getOrderStatus(orderId);
     }
 
@@ -96,51 +96,51 @@ contract IntegralDelay is IIntegralDelay {
         unlocked = 1;
     }
 
-    function factory() public view override returns (address) {
+    function factory() external view override returns (address) {
         return orders.factory;
     }
 
-    function totalShares(address token) public view override returns (uint256) {
+    function totalShares(address token) external view override returns (uint256) {
         return tokenShares.totalShares[token];
     }
 
-    function weth() public view override returns (address) {
+    function weth() external view override returns (address) {
         return tokenShares.weth;
     }
 
-    function delay() public view override returns (uint256) {
+    function delay() external view override returns (uint256) {
         return orders.delay;
     }
 
-    function lastProcessedOrderId() public view returns (uint256) {
+    function lastProcessedOrderId() external view returns (uint256) {
         return orders.lastProcessedOrderId;
     }
 
-    function newestOrderId() public view returns (uint256) {
+    function newestOrderId() external view returns (uint256) {
         return orders.newestOrderId;
     }
 
-    function getOrder(uint256 orderId) public view returns (Orders.OrderType orderType, uint256 validAfterTimestamp) {
+    function getOrder(uint256 orderId) external view returns (Orders.OrderType orderType, uint256 validAfterTimestamp) {
         return orders.getOrder(orderId);
     }
 
-    function isOrderCanceled(uint256 orderId) public view returns (bool) {
+    function isOrderCanceled(uint256 orderId) external view returns (bool) {
         return orders.canceled[orderId];
     }
 
-    function maxGasLimit() public view override returns (uint256) {
+    function maxGasLimit() external view override returns (uint256) {
         return orders.maxGasLimit;
     }
 
-    function maxGasPriceImpact() public view override returns (uint256) {
+    function maxGasPriceImpact() external view override returns (uint256) {
         return orders.maxGasPriceImpact;
     }
 
-    function gasPriceInertia() public view override returns (uint256) {
+    function gasPriceInertia() external view override returns (uint256) {
         return orders.gasPriceInertia;
     }
 
-    function gasPrice() public view override returns (uint256) {
+    function gasPrice() external view override returns (uint256) {
         return orders.gasPrice;
     }
 
@@ -148,7 +148,7 @@ contract IntegralDelay is IIntegralDelay {
         address pair,
         Orders.OrderType orderType,
         bool disabled
-    ) public override {
+    ) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         require(orderType != Orders.OrderType.Empty, 'ID_INVALID_ORDER_TYPE');
         if (orderType == Orders.OrderType.Deposit) {
@@ -163,41 +163,41 @@ contract IntegralDelay is IIntegralDelay {
         emit OrderDisabled(pair, orderType, disabled);
     }
 
-    function setOwner(address _owner) public override {
+    function setOwner(address _owner) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         owner = _owner;
         emit OwnerSet(owner);
     }
 
-    function setBot(address _bot, bool _isBot) public override {
+    function setBot(address _bot, bool _isBot) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         isBot[_bot] = _isBot;
         emit BotSet(_bot, _isBot);
     }
 
-    function setMaxGasLimit(uint256 _maxGasLimit) public override {
+    function setMaxGasLimit(uint256 _maxGasLimit) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.setMaxGasLimit(_maxGasLimit);
     }
 
-    function setDelay(uint256 _delay) public override {
+    function setDelay(uint256 _delay) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.delay = _delay;
         botExecuteTime = 4 * _delay;
         emit DelaySet(_delay);
     }
 
-    function setGasPriceInertia(uint256 _gasPriceInertia) public override {
+    function setGasPriceInertia(uint256 _gasPriceInertia) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.setGasPriceInertia(_gasPriceInertia);
     }
 
-    function setMaxGasPriceImpact(uint256 _maxGasPriceImpact) public override {
+    function setMaxGasPriceImpact(uint256 _maxGasPriceImpact) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.setMaxGasPriceImpact(_maxGasPriceImpact);
     }
 
-    function setTransferGasCost(address token, uint256 gasCost) public override {
+    function setTransferGasCost(address token, uint256 gasCost) external override {
         require(msg.sender == owner, 'ID_FORBIDDEN');
         orders.setTransferGasCost(token, gasCost);
     }
@@ -234,12 +234,12 @@ contract IntegralDelay is IIntegralDelay {
         return orders.newestOrderId;
     }
 
-    function execute(uint256 n) public override lock {
+    function execute(uint256 n) external override lock {
         emit Execute(msg.sender, n);
         uint256 gasBefore = gasleft();
         bool orderExecuted = false;
         for (uint256 i = 0; i < n; i++) {
-            if (isOrderCanceled(orders.lastProcessedOrderId + 1)) {
+            if (orders.canceled[orders.lastProcessedOrderId + 1]) {
                 orders.dequeueCanceledOrder();
                 continue;
             }
@@ -488,12 +488,12 @@ contract IntegralDelay is IIntegralDelay {
         address pair,
         address to,
         uint256 liquidity
-    ) public {
+    ) external {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         return TransferHelper.safeTransfer(pair, to, liquidity);
     }
 
-    function _executeDeposit(Orders.DepositOrder memory depositOrder) public {
+    function _executeDeposit(Orders.DepositOrder memory depositOrder) external {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         require(depositOrder.deadline >= block.timestamp, 'ID_EXPIRED');
 
@@ -597,7 +597,7 @@ contract IntegralDelay is IIntegralDelay {
         }
     }
 
-    function _executeWithdraw(Orders.WithdrawOrder memory withdrawOrder) public {
+    function _executeWithdraw(Orders.WithdrawOrder memory withdrawOrder) external {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         require(withdrawOrder.deadline >= block.timestamp, 'ID_EXPIRED');
 
@@ -624,7 +624,7 @@ contract IntegralDelay is IIntegralDelay {
         require(amount0 >= withdrawOrder.amount0Min && amount1 >= withdrawOrder.amount1Min, 'ID_INSUFFICIENT_AMOUNT');
     }
 
-    function _executeBuy(Orders.BuyOrder memory buyOrder) public {
+    function _executeBuy(Orders.BuyOrder memory buyOrder) external {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         require(buyOrder.deadline >= block.timestamp, 'ID_EXPIRED');
 
@@ -656,7 +656,7 @@ contract IntegralDelay is IIntegralDelay {
         }
     }
 
-    function _executeSell(Orders.SellOrder memory sellOrder) public {
+    function _executeSell(Orders.SellOrder memory sellOrder) external {
         require(msg.sender == address(this), 'ID_FORBIDDEN');
         require(sellOrder.deadline >= block.timestamp, 'ID_EXPIRED');
 
@@ -743,14 +743,17 @@ contract IntegralDelay is IIntegralDelay {
         orders.forgetOrder(orderId);
     }
 
-    function retryRefund(uint256 orderId) public lock {
+    function retryRefund(uint256 orderId) external override lock {
         (Orders.OrderType orderType, uint256 validAfterTimestamp) = orders.getFailedOrderType(orderId);
         performRefund(orderType, validAfterTimestamp, orderId, false);
     }
 
-    function cancelOrder(uint256 orderId) public lock {
+    function cancelOrder(uint256 orderId) external override lock {
         (Orders.OrderType orderType, uint256 validAfterTimestamp) = orders.getOrder(orderId);
-        require(validAfterTimestamp.sub(delay()).add(ORDER_CANCEL_TIME) < block.timestamp, 'ID_ORDER_NOT_EXCEEDED');
+        require(
+            validAfterTimestamp.sub(orders.delay).add(ORDER_CANCEL_TIME) < block.timestamp,
+            'ID_ORDER_NOT_EXCEEDED'
+        );
         performRefund(orderType, validAfterTimestamp, orderId, true);
         orders.canceled[orderId] = true;
     }

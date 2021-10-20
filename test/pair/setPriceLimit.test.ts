@@ -16,7 +16,7 @@ describe('IntegralPair.setPriceDeviationLimit', () => {
     await expect(factory.setPriceDeviationLimit(token0.address, token1.address, expandTo18Decimals(0.05), overrides))
       .to.emit(pair, 'SetPriceDeviationLimit')
       .withArgs(expandTo18Decimals(0.05))
-    await oracle.setPrice(expandTo18Decimals(1))
+    await oracle.setPrice(expandTo18Decimals(1), overrides)
     const amount = 100000
     await addLiquidity(expandTo18Decimals(amount), expandTo18Decimals(amount))
 

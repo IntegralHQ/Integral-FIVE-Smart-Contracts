@@ -307,7 +307,7 @@ describe('IntegralDelay.executeWithdraw', () => {
       unwrap: true,
     })
 
-    await failingToken.setRevertAfter((await failingToken.totalTransfers()) + 1)
+    await failingToken.setRevertAfter((await failingToken.totalTransfers()) + 1, overrides)
     const tx = await delay.execute(1, { ...overrides })
 
     const orderExecuted = await getEvents(tx, 'OrderExecuted')

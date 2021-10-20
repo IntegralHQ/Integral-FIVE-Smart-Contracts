@@ -84,7 +84,7 @@ contract IntegralToken is IIntegralToken, Votes {
     }
 
     function _mint(address to, uint256 _amount) internal {
-        uint96 amount = safe96(_amount);
+        uint96 amount = _amount.toUint96();
         totalSupply = totalSupply.add(_amount);
         balances[to] = balances[to].add96(amount);
         emit Transfer(address(0), to, _amount);
@@ -101,7 +101,7 @@ contract IntegralToken is IIntegralToken, Votes {
     function burn(uint256 _amount) external {
         require(isBurner[address(0)] || isBurner[msg.sender], 'IT_ONLY_WHITELISTED');
         require(!isBlacklisted[msg.sender], 'IT_BLACKLISTED');
-        uint96 amount = safe96(_amount);
+        uint96 amount = _amount.toUint96();
         totalSupply = totalSupply.sub(_amount, 'IT_INVALID_BURN_AMOUNT');
         balances[msg.sender] = balances[msg.sender].sub96(amount);
         emit Transfer(msg.sender, address(0), _amount);
@@ -111,7 +111,7 @@ contract IntegralToken is IIntegralToken, Votes {
 
     function approve(address spender, uint256 _amount) external returns (bool) {
         require(!isBlacklisted[msg.sender] && !isBlacklisted[spender], 'IT_BLACKLISTED');
-        uint96 amount = _amount == uint256(-1) ? uint96(-1) : safe96(_amount);
+        uint96 amount = _amount == type(uint256).max ? type(uint96).max : _amount.toUint96();
         _approve(msg.sender, spender, amount);
         return true;
     }
@@ -128,24 +128,23 @@ contract IntegralToken is IIntegralToken, Votes {
 
     function increaseAllowance(address spender, uint256 _extraAmount) external returns (bool) {
         require(!isBlacklisted[msg.sender] && !isBlacklisted[spender], 'IT_BLACKLISTED');
-        uint96 extraAmount = safe96(_extraAmount);
+        uint96 extraAmount = _extraAmount.toUint96();
         _approve(msg.sender, spender, allowances[msg.sender][spender].add96(extraAmount));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 _subtractedAmount) external returns (bool) {
         require(!isBlacklisted[msg.sender] && !isBlacklisted[spender], 'IT_BLACKLISTED');
-        uint96 subtractedAmount = safe96(_subtractedAmount);
+        uint96 subtractedAmount = _subtractedAmount.toUint96();
         uint96 currentAmount = allowances[msg.sender][spender];
         require(currentAmount >= subtractedAmount, 'IT_CANNOT_DECREASE');
         _approve(msg.sender, spender, currentAmount.sub96(subtractedAmount));
         return true;
     }
 
-    function transfer(address to, uint256 _amount) external returns (bool) {
+    function transfer(address to, uint256 amount) external returns (bool) {
         require(!isBlacklisted[msg.sender] && !isBlacklisted[to], 'IT_BLACKLISTED');
-        uint96 amount = safe96(_amount);
-        _transferTokens(msg.sender, to, amount);
+        _transferTokens(msg.sender, to, amount.toUint96());
         return true;
     }
 
@@ -156,7 +155,7 @@ contract IntegralToken is IIntegralToken, Votes {
     ) external returns (bool) {
         address spender = msg.sender;
         require(!isBlacklisted[spender] && !isBlacklisted[from] && !isBlacklisted[to], 'IT_BLACKLISTED');
-        uint96 amount = safe96(_amount);
+        uint96 amount = _amount.toUint96();
         uint96 spenderAllowance = allowances[from][spender];
         if (spender != from && spenderAllowance != uint96(-1)) {
             uint96 newAllowance = spenderAllowance.sub96(amount);
@@ -222,11 +221,6 @@ contract IntegralToken is IIntegralToken, Votes {
         require(signatory != address(0), 'IT_INVALID_SIGNATURE');
         require(nonce == nonces[signatory]++, 'IT_INVALID_NONCE');
         _delegateFrom(signatory, newDelegate);
-    }
-
-    function safe96(uint256 n) internal pure returns (uint96) {
-        require(n < 2**96, 'IT_EXCEEDS_96_BITS');
-        return uint96(n);
     }
 
     function getChainId() public pure returns (uint256) {

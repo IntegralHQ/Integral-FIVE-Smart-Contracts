@@ -22,7 +22,7 @@ describe('IntegralDelay.getOrderStatus', () => {
     await depositAndWait(delay, token0, token1, wallet)
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [DAY + 1])
     await mineBlock(wallet)
-    await delay.cancelOrder(1)
+    await delay.cancelOrder(1, overrides)
     expect(await delay.getOrderStatus(1)).to.eq(OrderStatus.Canceled)
   })
 

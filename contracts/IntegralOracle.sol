@@ -71,14 +71,14 @@ contract IntegralOracle is IIntegralOracle {
         emit UniswapPairSet(uniswapPair);
     }
 
-    function setPriceUpdateInterval(uint32 interval) public override {
+    function setPriceUpdateInterval(uint32 interval) external override {
         require(msg.sender == owner, 'IO_FORBIDDEN');
         require(interval > 0, 'IO_INTERVAL_CANNOT_BE_ZERO');
         priceUpdateInterval = interval;
         emit PriceUpdateIntervalSet(interval);
     }
 
-    function updatePrice() public override returns (uint32 _epoch) {
+    function updatePrice() external override returns (uint32 _epoch) {
         if (uniswapPair == address(0)) {
             return epoch;
         }
@@ -131,7 +131,7 @@ contract IntegralOracle is IIntegralOracle {
         int256[] calldata _bidQs,
         int256[] calldata _askExponents,
         int256[] calldata _askQs
-    ) public override {
+    ) external override {
         require(msg.sender == owner, 'IO_FORBIDDEN');
         require(_bidExponents.length == _bidQs.length, 'IO_LENGTH_MISMATCH');
         require(_askExponents.length == _askQs.length, 'IO_LENGTH_MISMATCH');
@@ -151,7 +151,7 @@ contract IntegralOracle is IIntegralOracle {
         uint256 xAfter,
         uint256 xBefore,
         uint256 yBefore
-    ) public view override returns (uint256 yAfter) {
+    ) external view override returns (uint256 yAfter) {
         int256 xAfterInt = normalizeAmount(xDecimals, xAfter);
         int256 xBeforeInt = normalizeAmount(xDecimals, xBefore);
         int256 yBeforeInt = normalizeAmount(yDecimals, yBefore);
@@ -165,7 +165,7 @@ contract IntegralOracle is IIntegralOracle {
         uint256 yAfter,
         uint256 xBefore,
         uint256 yBefore
-    ) public view override returns (uint256 xAfter) {
+    ) external view override returns (uint256 xAfter) {
         int256 yAfterInt = normalizeAmount(yDecimals, yAfter);
         int256 xBeforeInt = normalizeAmount(xDecimals, xBefore);
         int256 yBeforeInt = normalizeAmount(yDecimals, yBefore);
@@ -333,7 +333,7 @@ contract IntegralOracle is IIntegralOracle {
 
     // SPOT PRICE
 
-    function getSpotPrice(uint256 xCurrent, uint256 xBefore) public view override returns (uint256 spotPrice) {
+    function getSpotPrice(uint256 xCurrent, uint256 xBefore) external view override returns (uint256 spotPrice) {
         int256 xCurrentInt = normalizeAmount(xDecimals, xCurrent);
         int256 xBeforeInt = normalizeAmount(xDecimals, xBefore);
         int256 spotPriceInt = derivative(xCurrentInt.sub(xBeforeInt));
@@ -343,7 +343,7 @@ contract IntegralOracle is IIntegralOracle {
 
     // DERIVATIVES
 
-    function derivative(int256 t) public view returns (int256) {
+    function derivative(int256 t) internal view returns (int256) {
         if (t > 0) {
             return derivativeBid(t);
         } else if (t < 0) {
@@ -353,7 +353,7 @@ contract IntegralOracle is IIntegralOracle {
         }
     }
 
-    function derivativeBid(int256 t) public view returns (int256) {
+    function derivativeBid(int256 t) internal view returns (int256) {
         for (uint256 i = 1; i < bidExponents.length; i++) {
             int256 pPrevious = price.f18Mul(bidExponents[i - 1]);
             int256 pCurrent = price.f18Mul(bidExponents[i]);
@@ -366,7 +366,7 @@ contract IntegralOracle is IIntegralOracle {
         revert('IO_OVERFLOW');
     }
 
-    function derivativeAsk(int256 t) public view returns (int256) {
+    function derivativeAsk(int256 t) internal view returns (int256) {
         for (uint256 i = 1; i < askExponents.length; i++) {
             int256 pPrevious = price.f18Mul(askExponents[i - 1]);
             int256 pCurrent = price.f18Mul(askExponents[i]);

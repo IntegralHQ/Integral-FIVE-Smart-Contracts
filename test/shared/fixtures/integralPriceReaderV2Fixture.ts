@@ -4,6 +4,7 @@ import { integralAndUniswapFixture } from './integralAndUniswapFixture'
 import { deployPairForTokens } from './deployPairForTokens'
 import { getOracleFixtureFor } from './getOracleFixtureFor'
 import { deployTokens } from './deployTokens'
+import { overrides } from '../utilities'
 
 export async function priceReaderV2Fixture([wallet, other]: Wallet[]) {
   const {
@@ -20,7 +21,7 @@ export async function priceReaderV2Fixture([wallet, other]: Wallet[]) {
 
   await deployPairForTokens(wallet, oracle23.address, factory, token2, token3)
 
-  const priceReader = await new IntegralPriceReader__factory(wallet).deploy(factory.address)
+  const priceReader = await new IntegralPriceReader__factory(wallet).deploy(factory.address, overrides)
   return {
     wallet,
     other,

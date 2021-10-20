@@ -9,7 +9,7 @@ describe('IntegralStaking.withdrawAll', () => {
 
   it('withraw all', async () => {
     const { wallet, token, staking, stakingPeriod } = await loadFixture(stakingFixture)
-    const amount = expandTo18Decimals(1)
+    const amount = expandTo18Decimals(1_000_000_000)
 
     await staking.deposit(amount)
     await staking.deposit(amount)
@@ -34,7 +34,7 @@ describe('IntegralStaking.withdrawAll', () => {
 
   it('withdraw all with zero address', async () => {
     const { token, wallet, staking, stakingPeriod, other } = await loadFixture(stakingFixture)
-    const amount = expandTo18Decimals(1)
+    const amount = expandTo18Decimals(1_000_000_000)
 
     await staking.deposit(amount)
 

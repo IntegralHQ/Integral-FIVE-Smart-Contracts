@@ -13,7 +13,7 @@ describe('IntegralDelay.setOwner', () => {
 
   it('can be changed', async () => {
     const { delay, other } = await loadFixture(delayFixture)
-    await expect(delay.connect(other.address).setOwner(other.address)).to.be.revertedWith('ID_FORBIDDEN')
+    await expect(delay.connect(other).setOwner(other.address, overrides)).to.be.revertedWith('ID_FORBIDDEN')
 
     await expect(delay.setOwner(other.address, overrides)).to.emit(delay, 'OwnerSet').withArgs(other.address)
     expect(await delay.owner()).to.eq(other.address)

@@ -60,7 +60,7 @@ describe('IntegralDelay.execute', () => {
     await deposit(delay, token2, token3, wallet)
     await depositAndWait(delay, token2, token3, wallet)
 
-    await token0.setWasteTransferGas(true)
+    await token0.setWasteTransferGas(true, overrides)
     const tx = await delay.execute(3, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))
@@ -84,7 +84,7 @@ describe('IntegralDelay.execute', () => {
 
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [24 * 60 * 60 + 1])
     await mineBlock(wallet)
-    await delay.cancelOrder(1)
+    await delay.cancelOrder(1, overrides)
 
     const tx = await delay.execute(3, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
@@ -99,8 +99,8 @@ describe('IntegralDelay.execute', () => {
 
   it('should fail if executing from non-bot address', async () => {
     const { delay, token0, token1, wallet, other } = await loadFixture(delayFixture)
-    await delay.setBot(constants.AddressZero, false)
-    await delay.setBot(wallet.address, true)
+    await delay.setBot(constants.AddressZero, false, overrides)
+    await delay.setBot(wallet.address, true, overrides)
 
     await depositAndWait(delay, token0, token1, wallet)
     const delayFromOther = delay.connect(other)
@@ -109,7 +109,7 @@ describe('IntegralDelay.execute', () => {
 
   it('anyone can execute after 20 minutes', async () => {
     const { delay, token0, token1, wallet, other } = await loadFixture(delayFixture)
-    await delay.setBot(wallet.address, true)
+    await delay.setBot(wallet.address, true, overrides)
 
     await depositAndWait(delay, token0, token1, wallet)
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [20 * 60 + 1])

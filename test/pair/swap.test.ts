@@ -49,7 +49,7 @@ describe('IntegralPair.swap', () => {
         await token0.transfer(pair.address, expandTo18Decimals(amount0), overrides)
         const swapFee = expandTo18Decimals(amount0).mul(SWAP_FEE).div(PRECISION)
         const swapAmount = expandTo18Decimals(amount0).sub(swapFee)
-        const yAfter = await oracle.tradeX(expandTo18Decimals(reserve0).add(swapAmount), xBefore, yBefore)
+        const yAfter = await oracle.tradeX(expandTo18Decimals(reserve0).add(swapAmount), xBefore, yBefore, overrides)
         await expect(
           pair.swap(0, yBefore.sub(yAfter).add(WEI_SWAP_DIFFERENCE), wallet.address, overrides)
         ).to.be.revertedWith('IP_INVALID_SWAP')
@@ -99,7 +99,12 @@ describe('IntegralPair.swap', () => {
         await oracle.setPrice(expandTo18Decimals(price), overrides)
 
         await token1.transfer(pair.address, expandTo18Decimals(amount1), overrides)
-        const xAfter = await oracle.tradeY(expandTo18Decimals(reserve1 + amount1 * (1 - SWAP_FEE_N)), xBefore, yBefore)
+        const xAfter = await oracle.tradeY(
+          expandTo18Decimals(reserve1 + amount1 * (1 - SWAP_FEE_N)),
+          xBefore,
+          yBefore,
+          overrides
+        )
         await expect(
           pair.swap(xBefore.sub(xAfter).add(WEI_SWAP_DIFFERENCE), 0, wallet.address, overrides)
         ).to.be.revertedWith('IP_INVALID_SWAP')
@@ -132,7 +137,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount)
+    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount, overrides)
 
     const expectedOutputAmount = token1Amount.sub(token1After)
     await token0.transfer(pair.address, amount0, overrides)
@@ -169,7 +174,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount)
+    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount, overrides)
 
     const expectedOutputAmount = token0Amount.sub(token0After)
     await token1.transfer(pair.address, amount1, overrides)
@@ -206,7 +211,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount)
+    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount, overrides)
 
     const leftInContract = expandTo18Decimals(0.02)
 
@@ -238,7 +243,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount)
+    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount, overrides)
 
     const leftInContract = expandTo18Decimals(0.02)
 
@@ -280,7 +285,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount)
+    const token1After = await oracle.tradeX(token0Amount.add(effectiveAmount0), token0Amount, token1Amount, overrides)
 
     const expectedOutputAmount = token1Amount.sub(token1After)
     await token0.transfer(pair.address, amount0, overrides)
@@ -319,7 +324,7 @@ describe('IntegralPair.swap', () => {
 
     await addLiquidity(token0Amount, token1Amount)
     await oracle.setPrice(price, overrides)
-    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount)
+    const token0After = await oracle.tradeY(token1Amount.add(effectiveAmount1), token0Amount, token1Amount, overrides)
 
     const expectedOutputAmount = token0Amount.sub(token0After)
     await token1.transfer(pair.address, amount1, overrides)
@@ -348,11 +353,11 @@ describe('IntegralPair.swap', () => {
     const { pair, oracle, token1, addLiquidity, wallet } = await loadFixture(pairWithUnitOracleFixture)
 
     await addLiquidity(expandTo18Decimals(500), expandTo18Decimals(1000))
-    await oracle.updateEpoch()
+    await oracle.updateEpoch(overrides)
 
     const swapOutput = expandTo18Decimals(500)
     const swapInput = await pair.getSwapAmount1In(swapOutput)
-    await token1.transfer(pair.address, swapInput)
+    await token1.transfer(pair.address, swapInput, overrides)
     await expect(pair.swap(swapOutput, 0, wallet.address, overrides)).to.be.revertedWith('IP_INSUFFICIENT_LIQUIDITY')
   })
 
@@ -360,11 +365,11 @@ describe('IntegralPair.swap', () => {
     const { pair, oracle, token0, addLiquidity, wallet } = await loadFixture(pairWithUnitOracleFixture)
 
     await addLiquidity(expandTo18Decimals(1000), expandTo18Decimals(500))
-    await oracle.updateEpoch()
+    await oracle.updateEpoch(overrides)
 
     const swapOutput = expandTo18Decimals(500)
     const swapInput = await pair.getSwapAmount0In(swapOutput)
-    await token0.transfer(pair.address, swapInput)
+    await token0.transfer(pair.address, swapInput, overrides)
     await expect(pair.swap(0, swapOutput, wallet.address, overrides)).to.be.revertedWith('IP_INSUFFICIENT_LIQUIDITY')
   })
 
@@ -377,7 +382,7 @@ describe('IntegralPair.swap', () => {
 
   it('checks weth-dai specific price issue', async () => {
     const { pair, oracle, token0, token1, factory, addLiquidity, wallet, other } = await loadFixture(pairFixture)
-    const buyHelper = await new BuyHelper__factory(wallet).deploy()
+    const buyHelper = await new BuyHelper__factory(wallet).deploy(overrides)
 
     // token0: DAI, token1: WETH
 
@@ -387,14 +392,14 @@ describe('IntegralPair.swap', () => {
     const amount0Out = parseUnits('1000')
     const amount1Out = '0'
 
-    await oracle.setParameters(...getOracleParams('weth-dai', 'DAI'))
-    await oracle.setPrice('545609375715524')
-    await factory.setOracle(token0.address, token1.address, oracle.address)
+    await oracle.setParameters(...getOracleParams('weth-dai', 'DAI'), overrides)
+    await oracle.setPrice('545609375715524', overrides)
+    await factory.setOracle(token0.address, token1.address, oracle.address, overrides)
 
     await addLiquidity(reserve0, reserve1)
 
     const amountIn = await buyHelper.getSwapAmount1In(pair.address, amount0Out)
-    await token1.transfer(pair.address, amountIn)
+    await token1.transfer(pair.address, amountIn, overrides)
     await expect(pair.connect(other).swap(amount0Out, amount1Out, wallet.address, overrides))
       .to.emit(pair, 'Swap')
       .withArgs(other.address, wallet.address)

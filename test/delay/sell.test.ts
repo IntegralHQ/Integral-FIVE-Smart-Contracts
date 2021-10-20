@@ -117,7 +117,7 @@ describe('IntegralDelay.sell', () => {
 
     it('reverts when sell is disabled', async () => {
       const { delay, token0, token1, wallet, pair } = await loadFixture(delayFixture)
-      await delay.setOrderDisabled(pair.address, OrderType.Sell, true)
+      await delay.setOrderDisabled(pair.address, OrderType.Sell, true, overrides)
       const sellRequest = getDefaultSell(token0, token1, wallet)
       await expect(delay.sell(sellRequest, overrides)).to.revertedWith('OS_SELL_DISABLED')
 
@@ -130,7 +130,7 @@ describe('IntegralDelay.sell', () => {
     const { delay, token, weth, wallet } = await loadFixture(delayFixture)
 
     const gasPrice = utils.parseUnits('69.420', 'gwei')
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     await token.approve(delay.address, constants.MaxUint256, overrides)
 
@@ -158,7 +158,7 @@ describe('IntegralDelay.sell', () => {
     const { delay, token0, token1, wallet, pair } = await loadFixture(delayFixture)
 
     const gasPrice = utils.parseUnits('69.420', 'gwei')
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     const sellRequest = getDefaultSell(token0, token1, wallet)
     sellRequest.gasPrice = gasPrice
@@ -194,7 +194,7 @@ describe('IntegralDelay.sell', () => {
   it('enqueues an inverted order', async () => {
     const { delay, token0, token1, wallet, pair } = await loadFixture(delayFixture)
     const sellRequest = getDefaultSell(token1, token0, wallet)
-    await delay.setGasPrice(0)
+    await delay.setGasPrice(0, overrides)
 
     await token1.approve(delay.address, constants.MaxUint256, overrides)
     await delay.sell(sellRequest, overrides)
@@ -236,7 +236,7 @@ describe('IntegralDelay.sell', () => {
     const gasPrice = await delay.gasPrice()
     const sellRequest = getDefaultSell(token0, token1, wallet)
 
-    await token0.transfer(orderIdTest.address, utils.parseEther('10'))
+    await token0.transfer(orderIdTest.address, utils.parseEther('10'), overrides)
     await orderIdTest.approve(token0.address, delay.address, constants.MaxUint256, overrides)
 
     await expect(

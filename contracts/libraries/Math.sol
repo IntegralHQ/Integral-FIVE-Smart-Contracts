@@ -14,14 +14,6 @@ library Math {
         z = x > y ? x : y;
     }
 
-    function min32(uint32 x, uint32 y) internal pure returns (uint32 z) {
-        z = x < y ? x : y;
-    }
-
-    function max32(uint32 x, uint32 y) internal pure returns (uint32 z) {
-        z = x > y ? x : y;
-    }
-
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
     function sqrt(uint256 y) internal pure returns (uint256 z) {
         if (y > 3) {

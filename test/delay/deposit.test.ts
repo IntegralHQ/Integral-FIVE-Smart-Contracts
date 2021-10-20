@@ -71,7 +71,7 @@ describe('IntegralDelay.deposit', () => {
       const depositRequest = getDefaultDeposit(token0, token1, wallet)
 
       const gasPrice = 100
-      await delay.setGasPrice(gasPrice)
+      await delay.setGasPrice(gasPrice, overrides)
       await expect(
         delay.deposit(depositRequest, {
           ...overrides,
@@ -85,7 +85,7 @@ describe('IntegralDelay.deposit', () => {
 
       const gasLimit = 10000
       const gasPrice = 100
-      await delay.setGasPrice(gasPrice)
+      await delay.setGasPrice(gasPrice, overrides)
 
       const [token0, token1] = getOrderedTokens(token, weth)
       const depositRequest = getDefaultDeposit(token0, token1, wallet)
@@ -120,7 +120,7 @@ describe('IntegralDelay.deposit', () => {
 
     it('reverts when deposit is disabled', async () => {
       const { delay, token0, token1, wallet, pair } = await loadFixture(delayFixture)
-      await delay.setOrderDisabled(pair.address, OrderType.Deposit, true)
+      await delay.setOrderDisabled(pair.address, OrderType.Deposit, true, overrides)
       const depositRequest = getDefaultDeposit(token0, token1, wallet)
       await expect(delay.deposit(depositRequest, overrides)).to.revertedWith('OS_DEPOSIT_DISABLED')
 
@@ -133,7 +133,7 @@ describe('IntegralDelay.deposit', () => {
     const { delay, token, weth, wallet } = await loadFixture(delayFixture)
 
     const gasPrice = utils.parseUnits('100', 'gwei')
-    await delay.setGasPrice(gasPrice)
+    await delay.setGasPrice(gasPrice, overrides)
 
     await token.approve(delay.address, constants.MaxUint256, overrides)
 
@@ -249,8 +249,8 @@ describe('IntegralDelay.deposit', () => {
     const gasPrice = await delay.gasPrice()
     const depositRequest = getDefaultDeposit(token0, token1, wallet)
 
-    await token0.transfer(orderIdTest.address, utils.parseEther('10'))
-    await token1.transfer(orderIdTest.address, utils.parseEther('10'))
+    await token0.transfer(orderIdTest.address, utils.parseEther('10'), overrides)
+    await token1.transfer(orderIdTest.address, utils.parseEther('10'), overrides)
     await orderIdTest.approve(token0.address, delay.address, constants.MaxUint256, overrides)
     await orderIdTest.approve(token1.address, delay.address, constants.MaxUint256, overrides)
 

@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { pointsTokenFixture } from '../shared/fixtures'
 import { setupFixtureLoader } from '../shared/setup'
+import { overrides } from '../shared/utilities'
 
 describe('IntegralPointsToken.setOwner', () => {
   const loadFixture = setupFixtureLoader()
@@ -11,7 +12,9 @@ describe('IntegralPointsToken.setOwner', () => {
     await expect(token.setOwner(other.address)).to.emit(token, 'OwnerSet').withArgs(other.address)
     expect(await token.owner()).to.eq(other.address)
 
-    await expect(token.connect(other).setOwner(wallet.address)).to.emit(token, 'OwnerSet').withArgs(wallet.address)
+    await expect(token.connect(other).setOwner(wallet.address, overrides))
+      .to.emit(token, 'OwnerSet')
+      .withArgs(wallet.address)
     expect(await token.owner()).to.eq(wallet.address)
   })
 

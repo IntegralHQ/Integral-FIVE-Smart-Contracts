@@ -18,7 +18,7 @@ describe('IntegralPair.syncWithOracle', () => {
 
     await addLiquidity(reserve0, reserve1)
     await oracle.setPrice(expandTo18Decimals(400), overrides)
-    await pair.syncWithOracle()
+    await pair.syncWithOracle(overrides)
 
     const referencesAfter = await pair.getReferences()
     expect(referencesAfter[0]).to.eq(reserve0)

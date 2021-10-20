@@ -15,14 +15,14 @@ describe('IntegralDelay.setMaxGasPriceImpact', () => {
   it('cannot be greater than gasPriceInertia', async () => {
     const { delay } = await loadFixture(delayFixture)
     const gasPriceInertia = await delay.gasPriceInertia()
-    await expect(delay.setMaxGasPriceImpact(gasPriceInertia.add(1))).to.be.revertedWith(
+    await expect(delay.setMaxGasPriceImpact(gasPriceInertia.add(1), overrides)).to.be.revertedWith(
       'OS_INVALID_MAX_GAS_PRICE_IMPACT'
     )
   })
 
   it('can be changed', async () => {
     const { delay, other } = await loadFixture(delayFixture)
-    await expect(delay.connect(other.address).setMaxGasPriceImpact(500_000)).to.be.revertedWith('ID_FORBIDDEN')
+    await expect(delay.connect(other).setMaxGasPriceImpact(500_000, overrides)).to.be.revertedWith('ID_FORBIDDEN')
 
     await expect(delay.setMaxGasPriceImpact(500_000, overrides))
       .to.emit(delay, 'MaxGasPriceImpactSet')

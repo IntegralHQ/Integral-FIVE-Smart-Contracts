@@ -41,9 +41,14 @@ library SafeMath {
         }
     }
 
-    function safe32(uint256 n) internal pure returns (uint32) {
+    function toUint32(uint256 n) internal pure returns (uint32) {
         require(n < 2**32, 'IS_EXCEEDS_32_BITS');
         return uint32(n);
+    }
+
+    function toUint96(uint256 n) internal pure returns (uint96) {
+        require(n < 2**96, 'IT_EXCEEDS_96_BITS');
+        return uint96(n);
     }
 
     function add96(uint96 a, uint96 b) internal pure returns (uint96 c) {
@@ -54,35 +59,5 @@ library SafeMath {
     function sub96(uint96 a, uint96 b) internal pure returns (uint96) {
         require(b <= a, 'SM_SUB_UNDERFLOW');
         return a - b;
-    }
-
-    function mul96(uint96 x, uint96 y) internal pure returns (uint96 z) {
-        require(y == 0 || (z = x * y) / y == x, 'SM_MUL_OVERFLOW');
-    }
-
-    function div96(uint96 a, uint96 b) internal pure returns (uint96) {
-        require(b > 0, 'SM_DIV_BY_ZERO');
-        uint96 c = a / b;
-        return c;
-    }
-
-    function add32(uint32 a, uint32 b) internal pure returns (uint32 c) {
-        c = a + b;
-        require(c >= a, 'SM_ADD_OVERFLOW');
-    }
-
-    function sub32(uint32 a, uint32 b) internal pure returns (uint32) {
-        require(b <= a, 'SM_SUB_UNDERFLOW');
-        return a - b;
-    }
-
-    function mul32(uint32 x, uint32 y) internal pure returns (uint32 z) {
-        require(y == 0 || (z = x * y) / y == x, 'SM_MUL_OVERFLOW');
-    }
-
-    function div32(uint32 a, uint32 b) internal pure returns (uint32) {
-        require(b > 0, 'SM_DIV_BY_ZERO');
-        uint32 c = a / b;
-        return c;
     }
 }

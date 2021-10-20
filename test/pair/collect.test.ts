@@ -23,12 +23,12 @@ describe('IntegralPair.collect', () => {
     await addLiquidity(token0Amount, token1Amount)
 
     const swapFee = expandTo18Decimals(0.5)
-    await factory.setSwapFee(token0.address, token1.address, swapFee)
+    await factory.setSwapFee(token0.address, token1.address, swapFee, overrides)
 
-    await oracle.updateEpoch()
+    await oracle.updateEpoch(overrides)
 
     const amountIn = expandTo18Decimals(1)
-    await token1.transfer(pair.address, amountIn)
+    await token1.transfer(pair.address, amountIn, overrides)
     const amountOut = await pair.getSwapAmount0Out(amountIn)
     const swapFeeAmount = amountIn.mul(swapFee).div(PRECISION)
 

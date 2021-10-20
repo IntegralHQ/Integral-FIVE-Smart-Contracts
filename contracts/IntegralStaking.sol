@@ -45,7 +45,6 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
     function setOwner(address _owner) external override {
         require(msg.sender == owner, 'IS_FORBIDDEN');
-
         owner = _owner;
     }
 
@@ -55,7 +54,6 @@ contract IntegralStaking is IIntegralStaking, Votes {
         require(stopBlock == 0, 'IS_ALREADY_STOPPED');
 
         stopBlock = _stopBlock;
-
         emit StopIssuance(_stopBlock);
     }
 
@@ -70,7 +68,7 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
         // add a new stake
         UserStake memory userStake;
-        userStake.startBlock = block.number.safe32();
+        userStake.startBlock = block.number.toUint32();
         userStake.lockedAmount = _amount;
         userStakes[user].push(userStake);
 
@@ -86,14 +84,12 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
         address user = msg.sender;
         uint96 withdrawnAmount;
-        uint32 currentBlock = block.number.safe32();
         uint256 length = userStakes[user].length;
         for (uint256 i = 0; i < length; i++) {
             UserStake memory userStake = userStakes[user][i];
-            uint32 endBlock = _calculateStopBlock(userStake.startBlock);
-            if (endBlock < currentBlock && userStake.withdrawn == false) {
+            uint256 endBlock = _calculateStopBlock(userStake.startBlock);
+            if (endBlock < block.number && userStake.withdrawn == false) {
                 withdrawnAmount = withdrawnAmount.add96(userStake.lockedAmount);
-
                 userStakes[user][i].withdrawn = true;
             }
         }
@@ -111,9 +107,8 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
         UserStake memory userStake = userStakes[user][_stakeId];
 
-        uint32 currentBlock = block.number.safe32();
-        uint32 endBlock = _calculateStopBlock(userStake.startBlock);
-        require(endBlock <= currentBlock, 'IS_LOCKED');
+        uint256 endBlock = _calculateStopBlock(userStake.startBlock);
+        require(endBlock <= block.number, 'IS_LOCKED');
         require(userStake.withdrawn == false, 'IS_ALREADY_WITHDRAWN');
 
         uint96 withdrawnAmount = userStake.lockedAmount;
@@ -139,7 +134,7 @@ contract IntegralStaking is IIntegralStaking, Votes {
 
         address user = msg.sender;
         uint96 claimedAmount;
-        uint32 currentBlock = block.number.safe32();
+        uint32 currentBlock = block.number.toUint32();
         uint256 length = userStakes[user].length;
         for (uint256 i = 0; i < length; i++) {
             uint96 _getClaimableAmount = _getClaimable(user, i);
@@ -163,7 +158,7 @@ contract IntegralStaking is IIntegralStaking, Votes {
         uint96 claimedAmount = _getClaimable(user, _stakeId);
         require(claimedAmount != 0, 'IS_ALREADY_CLAIMED');
 
-        userStakes[user][_stakeId].claimedBlock = block.number.safe32();
+        userStakes[user][_stakeId].claimedBlock = block.number.toUint32();
 
         IIntegralToken(integralToken).mint(_to, claimedAmount);
 
@@ -198,18 +193,21 @@ contract IntegralStaking is IIntegralStaking, Votes {
     function _getClaimable(address user, uint256 stakeId) internal view returns (uint96 claimableAmount) {
         UserStake memory userStake = userStakes[user][stakeId];
 
-        uint32 fromBlock = Math.max32(userStake.startBlock, userStake.claimedBlock);
-        uint32 toBlock = Math.min32(block.number.safe32(), _calculateStopBlock(userStake.startBlock));
+        uint256 fromBlock = Math.max(userStake.startBlock, userStake.claimedBlock);
+        uint256 toBlock = Math.min(block.number, _calculateStopBlock(userStake.startBlock));
 
         if (fromBlock < toBlock) {
-            claimableAmount = userStake.lockedAmount.mul96(ratePerBlockNumerator).mul96(toBlock.sub32(fromBlock)).div96(
-                    ratePerBlockDenominator
-                );
+            claimableAmount = userStake
+                .lockedAmount
+                .mul(ratePerBlockNumerator)
+                .mul(toBlock.sub(fromBlock))
+                .div(ratePerBlockDenominator)
+                .toUint96();
         }
     }
 
-    function _calculateStopBlock(uint32 startBlock) internal view returns (uint32) {
-        uint32 endBlock = startBlock.add32(durationInBlocks);
+    function _calculateStopBlock(uint32 startBlock) internal view returns (uint256) {
+        uint256 endBlock = startBlock.add(durationInBlocks);
         return (stopBlock == 0 || endBlock < stopBlock) ? endBlock : stopBlock;
     }
 }

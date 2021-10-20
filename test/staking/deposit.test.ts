@@ -10,7 +10,7 @@ describe('IntegralStaking.deposit', () => {
     const { token, staking } = await loadFixture(stakingFixture)
     await token.approve(staking.address, 0)
 
-    await expect(staking.deposit(expandTo18Decimals(1))).to.be.revertedWith('TH_TRANSFER_FROM_FAILED')
+    await expect(staking.deposit(expandTo18Decimals(1_000_000_000))).to.be.revertedWith('TH_TRANSFER_FROM_FAILED')
   })
 
   it('deposit zero amount', async () => {
@@ -21,7 +21,7 @@ describe('IntegralStaking.deposit', () => {
 
   it('change balance', async () => {
     const { wallet, token, staking } = await loadFixture(stakingFixture)
-    const amount = expandTo18Decimals(1)
+    const amount = expandTo18Decimals(1_000_000_000)
 
     await expect(staking.deposit(amount)).to.emit(staking, 'Deposit').withArgs(wallet.address, 0, amount)
 
@@ -30,7 +30,7 @@ describe('IntegralStaking.deposit', () => {
 
   it('multiple deposits', async () => {
     const { wallet, staking } = await loadFixture(stakingFixture)
-    const amount = expandTo18Decimals(1)
+    const amount = expandTo18Decimals(1_000_000_000)
 
     await expect(staking.deposit(amount)).to.emit(staking, 'Deposit').withArgs(wallet.address, 0, amount)
 
@@ -53,7 +53,7 @@ describe('IntegralStaking.deposit', () => {
 
   it('change voting power', async () => {
     const { wallet, staking } = await loadFixture(stakingFixture)
-    const amount = expandTo18Decimals(1)
+    const amount = expandTo18Decimals(1_000_000_000)
 
     expect(await staking.getCurrentVotes(wallet.address)).to.be.equal(0)
 

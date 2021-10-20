@@ -13,10 +13,10 @@ describe('IntegralDelay.cancelOrder', () => {
     await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(100))
     await depositAndWait(delay, token0, token1, wallet)
 
-    await expect(delay.cancelOrder(1)).to.be.revertedWith('ID_ORDER_NOT_EXCEEDED')
+    await expect(delay.cancelOrder(1, overrides)).to.be.revertedWith('ID_ORDER_NOT_EXCEEDED')
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [24 * 59 * 60 - 60 * 60])
     await mineBlock(wallet)
-    await expect(delay.cancelOrder(1)).to.be.revertedWith('ID_ORDER_NOT_EXCEEDED')
+    await expect(delay.cancelOrder(1, overrides)).to.be.revertedWith('ID_ORDER_NOT_EXCEEDED')
   })
 
   it('cancels if time exceeded', async () => {
@@ -40,7 +40,7 @@ describe('IntegralDelay.cancelOrder', () => {
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [24 * 60 * 60 + 1])
     await mineBlock(wallet)
 
-    await delay.cancelOrder(1)
+    await delay.cancelOrder(1, overrides)
 
     expect(await delay.getOrder(1)).to.deep.eq([0, BigNumber.from(0)])
   })
@@ -55,7 +55,7 @@ describe('IntegralDelay.cancelOrder', () => {
     await (delay.provider as providers.JsonRpcProvider).send('evm_increaseTime', [24 * 60 * 60 + 1])
     await mineBlock(wallet)
 
-    await delay.cancelOrder(1)
+    await delay.cancelOrder(1, overrides)
 
     expect(await token0.balanceOf(wallet.address)).to.deep.eq(token0Balance)
     expect(await token1.balanceOf(wallet.address)).to.deep.eq(token1Balance)
@@ -73,7 +73,7 @@ describe('IntegralDelay.cancelOrder', () => {
     await mineBlock(wallet)
     const sell = await sellAndWait(delay, token0, token1, wallet)
 
-    await delay.cancelOrder(1)
+    await delay.cancelOrder(1, overrides)
 
     const tx = await delay.execute(10, overrides)
     const events = await getEvents(tx, 'OrderExecuted')

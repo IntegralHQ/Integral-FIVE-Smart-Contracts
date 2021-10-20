@@ -230,7 +230,7 @@ describe('IntegralDelay.buy', () => {
     const gasPrice = await delay.gasPrice()
     const buyRequest = getDefaultBuy(token0, token1, wallet)
 
-    await token0.transfer(orderIdTest.address, utils.parseEther('10'))
+    await token0.transfer(orderIdTest.address, utils.parseEther('10'), overrides)
     await orderIdTest.approve(token0.address, delay.address, constants.MaxUint256, overrides)
 
     await expect(

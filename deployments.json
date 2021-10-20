@@ -100,8 +100,8 @@
       "usdc-usdt": "0x855D8c8e0bC0Fa521184b1f491d481957824376c"
     },
     "integralStaking": {
-      "sixMonths": "0xB78F5AF1598656Ac666F816d312Ae04203207076",
-      "threeYears": "0x15A6Aef205899C417D9f6B8ef38075D78A67cB76"
+      "sixMonths": "0xd514094E40d9Abf634B7586e6F045b9046aCbc77",
+      "threeYears": "0xA56989c1FA2a9041C45AA50af772f34f03796100"
     },
     "priceReader": "0xB089726BEf3A9a6c336f2701fD630024DA534039"
   },
@@ -207,8 +207,8 @@
     "priceReader": "0x75e4955dd2B608Eb7A821EefCbBacB5f9dC978AF",
     "integralTimeRelease": "0xc8805CeBD927941a3B26e2EDCed20d666Fb118Ba",
     "integralStaking": {
-      "sixMonths": "0x90477da311c24dB29e0f50D869E4AbE0820ECae8",
-      "threeYears": "0xFDED703178Fac52799320BC0244aeD7dde0b330F"
+      "sixMonths": "0x36bD665392236b20bd42e161f02Bf0ae1d9441Ff",
+      "threeYears": "0xFFc0EAC1a1aE79C697607229Aca43Ef422625a40"
     }
   }
 }

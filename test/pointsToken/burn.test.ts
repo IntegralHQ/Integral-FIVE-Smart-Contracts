@@ -14,15 +14,15 @@ describe('IntegralPointsToken.burn', () => {
 
   it('can add burner', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
-    await token.setBurner(other.address, true)
+    await token.setBurner(other.address, true, overrides)
     expect(await token.isBurner(other.address)).to.eq(true)
   })
 
   it('can remove burner', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
-    await token.setBurner(other.address, true)
+    await token.setBurner(other.address, true, overrides)
     expect(await token.isBurner(other.address)).to.eq(true)
-    await token.setBurner(other.address, false)
+    await token.setBurner(other.address, false, overrides)
     expect(await token.isBurner(other.address)).to.eq(false)
   })
 
@@ -30,7 +30,7 @@ describe('IntegralPointsToken.burn', () => {
     const { token } = await loadFixture(pointsTokenFixture)
     const totalSupply = await token.totalSupply()
     const burntAmount = expandTo18Decimals(1)
-    await token.burn(burntAmount)
+    await token.burn(burntAmount, overrides)
     expect(await token.totalSupply()).to.eq(totalSupply.sub(burntAmount))
   })
 
@@ -44,7 +44,7 @@ describe('IntegralPointsToken.burn', () => {
     const { token, wallet } = await loadFixture(pointsTokenFixture)
     const balance = await token.balanceOf(wallet.address)
     const burntAmount = expandTo18Decimals(1)
-    await token.burn(burntAmount)
+    await token.burn(burntAmount, overrides)
     expect(await token.balanceOf(wallet.address)).to.eq(balance.sub(burntAmount))
   })
 
@@ -57,8 +57,8 @@ describe('IntegralPointsToken.burn', () => {
   it('whitelisted address zero allows everyone to burn', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await token.mint(other.address, amount)
-    await token.setBurner(constants.AddressZero, true)
+    await token.mint(other.address, amount, overrides)
+    await token.setBurner(constants.AddressZero, true, overrides)
     await expect(token.connect(other).burn(amount, overrides))
       .to.emit(token, 'Transfer')
       .withArgs(other.address, constants.AddressZero, amount)
@@ -66,9 +66,9 @@ describe('IntegralPointsToken.burn', () => {
 
   it('insufficient balance', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
-    await token.mint(other.address, expandTo18Decimals(10))
+    await token.mint(other.address, expandTo18Decimals(10), overrides)
     const balance = await token.balanceOf(other.address)
-    await token.setBurner(other.address, true)
+    await token.setBurner(other.address, true, overrides)
     await expect(token.connect(other).burn(balance.add(1))).to.be.revertedWith('SM_SUB_UNDERFLOW')
   })
 })

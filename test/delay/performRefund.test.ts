@@ -13,8 +13,8 @@ describe('IntegralDelay.performRefund', () => {
   it('deletes order after completed refund', async () => {
     const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFailingFixture)
     await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-    await token0.transfer(other.address, expandTo18Decimals(10))
-    await token1.transfer(other.address, expandTo18Decimals(10))
+    await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+    await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
     const deposit = await depositAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
@@ -40,14 +40,14 @@ describe('IntegralDelay.performRefund', () => {
     it('before 1 year', async () => {
       const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const token0InitialBalance = await token0.balanceOf(other.address)
       const token1InitialBalance = await token1.balanceOf(other.address)
       await depositAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       expect(await token0.balanceOf(other.address)).to.lt(token0InitialBalance)
 
       const order = await delay.getOrder(1)
@@ -55,7 +55,7 @@ describe('IntegralDelay.performRefund', () => {
         delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
       ).to.be.revertedWith('ID_REFUND_FAILED')
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
 
       expect(await token0.balanceOf(other.address)).to.deep.eq(token0InitialBalance)
@@ -65,14 +65,14 @@ describe('IntegralDelay.performRefund', () => {
     it('after 1 year', async () => {
       const { delay, token0, token1, wallet, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const initialToken0OwnerBalance = await token0.balanceOf(wallet.address)
       const initialToken1OwnerBalance = await token1.balanceOf(wallet.address)
       const deposit = await depositAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))
@@ -83,7 +83,7 @@ describe('IntegralDelay.performRefund', () => {
         .to.emit(delay, 'RefundFailed')
         .withArgs(deposit.to, token1.address, deposit.amount1, encodeErrorData('TH_TRANSFER_FAILED'))
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await (delay.provider as any).send('evm_increaseTime', [YEAR])
       const order = await delay.getOrder(1)
       await mineBlock(wallet)
@@ -113,15 +113,15 @@ describe('IntegralDelay.performRefund', () => {
     it('before 1 year', async () => {
       const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const token0InitialBalance = await token0.balanceOf(other.address)
       const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other, {
         gasLimit: 400000,
       })
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))
@@ -136,7 +136,7 @@ describe('IntegralDelay.performRefund', () => {
         delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
       ).to.be.revertedWith('ID_REFUND_FAILED')
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
 
       expect(await token0.balanceOf(other.address)).to.deep.eq(token0InitialBalance)
@@ -145,15 +145,15 @@ describe('IntegralDelay.performRefund', () => {
     it('after 1 year', async () => {
       const { delay, token0, token1, wallet, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const initialToken0OwnerBalance = await token0.balanceOf(wallet.address)
       const buy = await buyAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other, {
         gasLimit: 400000,
       })
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))
@@ -162,7 +162,7 @@ describe('IntegralDelay.performRefund', () => {
         .to.emit(delay, 'RefundFailed')
         .withArgs(buy.to, token0.address, buy.amountInMax, encodeErrorData('TH_TRANSFER_FAILED'))
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await (delay.provider as any).send('evm_increaseTime', [YEAR])
       const order = await delay.getOrder(1)
       await mineBlock(wallet)
@@ -175,8 +175,8 @@ describe('IntegralDelay.performRefund', () => {
     it('refunds ether', async () => {
       const { delay, token0, token1, addLiquidity, other, wallet } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const balanceBefore = await other.getBalance()
       await buyAndWait(delay, token0, token1, other)
@@ -191,13 +191,13 @@ describe('IntegralDelay.performRefund', () => {
     it('before 1 year', async () => {
       const { delay, token0, token1, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const token0InitialBalance = await token0.balanceOf(other.address)
       const sell = await sellAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))
@@ -212,7 +212,7 @@ describe('IntegralDelay.performRefund', () => {
         delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
       ).to.be.revertedWith('ID_REFUND_FAILED')
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await delay.testPerformRefund(order.orderType, order.validAfterTimestamp, 1, false, overrides)
 
       expect(await token0.balanceOf(other.address)).to.deep.eq(token0InitialBalance)
@@ -221,13 +221,13 @@ describe('IntegralDelay.performRefund', () => {
     it('after 1 year', async () => {
       const { delay, token0, token1, wallet, addLiquidity, other } = await loadFixture(delayFailingFixture)
       await addLiquidity(expandTo18Decimals(100), expandTo18Decimals(100))
-      await token0.transfer(other.address, expandTo18Decimals(10))
-      await token1.transfer(other.address, expandTo18Decimals(10))
+      await token0.transfer(other.address, expandTo18Decimals(10), overrides)
+      await token1.transfer(other.address, expandTo18Decimals(10), overrides)
 
       const initialToken0OwnerBalance = await token0.balanceOf(wallet.address)
       const sell = await sellAndWait(delay.connect(other), token0.connect(other), token1.connect(other), other)
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))
@@ -236,7 +236,7 @@ describe('IntegralDelay.performRefund', () => {
         .to.emit(delay, 'RefundFailed')
         .withArgs(sell.to, token0.address, sell.amountIn, encodeErrorData('TH_TRANSFER_FAILED'))
 
-      await token0.setWasteTransferGas(false)
+      await token0.setWasteTransferGas(false, overrides)
       await (delay.provider as any).send('evm_increaseTime', [YEAR])
       const order = await delay.getOrder(1)
       await mineBlock(wallet)

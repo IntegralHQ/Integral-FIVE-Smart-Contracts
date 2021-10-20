@@ -14,7 +14,7 @@ describe('IntegralToken.transfer', () => {
 
   it('reverts on insufficient balance', async () => {
     const { token, other } = await loadFixture(tokenFixture)
-    await expect(token.transfer(other.address, expandTo18Decimals(1000000), overrides)).to.be.revertedWith(
+    await expect(token.transfer(other.address, expandTo18Decimals(11_000_000_000), overrides)).to.be.revertedWith(
       'SM_SUB_UNDERFLOW'
     )
   })

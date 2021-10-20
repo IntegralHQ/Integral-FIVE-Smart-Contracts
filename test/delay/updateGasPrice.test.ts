@@ -61,7 +61,7 @@ describe('IntegralDelay.updateGasPrice', () => {
 
   it('has a precision of 0.001 gwei', async () => {
     const { delay } = await loadFixture(delayFixture)
-    await delay.setGasPrice(utils.parseUnits('20', 'gwei'))
+    await delay.setGasPrice(utils.parseUnits('20', 'gwei'), overrides)
     await delay.testUpdateGasPrice(500_000, {
       ...overrides,
       gasPrice: utils.parseUnits('21.95', 'gwei'),
@@ -79,7 +79,7 @@ describe('IntegralDelay.updateGasPrice', () => {
   for (const { gasUsed, txGasPrice, expected } of testCases) {
     it(`gasUsed=${gasUsed} txGasPrice=${utils.formatUnits(txGasPrice, 'gwei')}`, async () => {
       const { delay } = await loadFixture(delayFixture)
-      await delay.setGasPrice(utils.parseUnits('20', 'gwei'))
+      await delay.setGasPrice(utils.parseUnits('20', 'gwei'), overrides)
       await delay.testUpdateGasPrice(gasUsed, {
         ...overrides,
         gasPrice: utils.parseUnits(txGasPrice.toString(), 'gwei'),

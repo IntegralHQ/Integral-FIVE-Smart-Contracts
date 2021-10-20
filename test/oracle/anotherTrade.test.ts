@@ -19,10 +19,10 @@ describe('IntegralOracle.trade', () => {
     const xBefore = '20200527080520057328732708'
     const yBefore = '7150715070387038'
 
-    const yAfter = await oracle.tradeX(xAfter, xBefore, yBefore)
+    const yAfter = await oracle.tradeX(xAfter, xBefore, yBefore, overrides)
     console.log('tradeX yAfter:', yAfter.toString())
 
-    const _xAfter = await oracle.tradeY(yAfter, xBefore, yBefore)
+    const _xAfter = await oracle.tradeY(yAfter, xBefore, yBefore, overrides)
     console.log('tradeY xAfter: ', _xAfter.toString())
     const diffrence = BigNumber.from(xAfter).sub(_xAfter)
     console.log('difference: ', diffrence.toString())

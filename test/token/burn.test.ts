@@ -40,7 +40,7 @@ describe('IntegralToken.burn', () => {
 
   it('reverts when burntAmount exceeds totalSupply', async () => {
     const { token } = await loadFixture(tokenFixture)
-    await expect(token.burn(expandTo18Decimals(1000000000))).to.be.revertedWith('IT_INVALID_BURN_AMOUNT')
+    await expect(token.burn(expandTo18Decimals(11_000_000_000))).to.be.revertedWith('IT_INVALID_BURN_AMOUNT')
   })
 
   it('decreases balance of issuer', async () => {

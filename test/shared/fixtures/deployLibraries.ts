@@ -5,16 +5,17 @@ import { Orders__factory } from '../../../build/types'
 import { AddLiquidity__factory } from '../../../build/types/factories/AddLiquidity__factory'
 import { BuyHelper__factory } from '../../../build/types/factories/BuyHelper__factory'
 import WithdrawHelper from '../../../build/WithdrawHelper.json'
+import { overrides } from '../utilities'
 
 export async function deployLibraries(wallet: Wallet) {
   const withdrawHelper = await deployContract(wallet, WithdrawHelper, [])
-  const addLiquidity = await new AddLiquidity__factory(wallet).deploy()
-  const tokenShares = await new ContractFactory(TokenShares.abi, TokenShares.bytecode, wallet).deploy()
+  const addLiquidity = await new AddLiquidity__factory(wallet).deploy(overrides)
+  const tokenShares = await new ContractFactory(TokenShares.abi, TokenShares.bytecode, wallet).deploy(overrides)
   const orders = await new Orders__factory(
     { 'contracts/libraries/TokenShares.sol:TokenShares': tokenShares.address },
     wallet
-  ).deploy()
-  const buyHelper = await new BuyHelper__factory(wallet).deploy()
+  ).deploy(overrides)
+  const buyHelper = await new BuyHelper__factory(wallet).deploy(overrides)
   return {
     libraries: {
       'contracts/libraries/TokenShares.sol:TokenShares': tokenShares.address,

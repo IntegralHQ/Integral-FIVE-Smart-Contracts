@@ -161,13 +161,13 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
     function getTokensLeft() public view returns (uint96) {
         uint256 allocationTime1 = option1EndBlock.sub(option1StartBlock);
         uint256 claimableTime1 = option1StopBlock.sub(option1StartBlock);
-        uint96 allocation1 = safe96(uint256(option1TotalAllocations).mul(claimableTime1).div(allocationTime1));
+        uint256 allocation1 = option1TotalAllocations.mul(claimableTime1).div(allocationTime1);
 
         uint256 allocationTime2 = option2EndBlock.sub(option2StartBlock);
         uint256 claimableTime2 = option2StopBlock.sub(option2StartBlock);
-        uint96 allocation2 = safe96(uint256(option2TotalAllocations).mul(claimableTime2).div(allocationTime2));
+        uint256 allocation2 = option2TotalAllocations.mul(claimableTime2).div(allocationTime2);
 
-        return allocation1.add96(allocation2).sub96(option1TotalClaimed).sub96(option2TotalClaimed);
+        return allocation1.add(allocation2).sub(option1TotalClaimed).sub(option2TotalClaimed).toUint96();
     }
 
     function setOption1StopBlock(uint256 _option1StopBlock) external {
@@ -211,7 +211,7 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         }
         uint256 elapsed = Math.min(blockNumber, option1StopBlock).sub(option1StartBlock);
         uint256 allocationTime = option1EndBlock.sub(option1StartBlock);
-        return safe96(uint256(option1[wallet].allocation).mul(elapsed).div(allocationTime));
+        return option1[wallet].allocation.mul(elapsed).div(allocationTime).toUint96();
     }
 
     function getReleasedOption2(address wallet) public view returns (uint96) {
@@ -224,7 +224,7 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         }
         uint256 elapsed = Math.min(blockNumber, option2StopBlock).sub(option2StartBlock);
         uint256 allocationTime = option2EndBlock.sub(option2StartBlock);
-        return safe96(uint256(option2[wallet].allocation).mul(elapsed).div(allocationTime));
+        return option2[wallet].allocation.mul(elapsed).div(allocationTime).toUint96();
     }
 
     function getClaimableOption1(address wallet) external view returns (uint256) {
@@ -275,46 +275,41 @@ contract IntegralTimeRelease is IIntegralTimeRelease, Votes {
         emit Claim(sender, to, option1Amount, option2Amount);
     }
 
-    function safe96(uint256 n) internal pure returns (uint96) {
-        require(n < 2**96, 'IT_EXCEEDS_96_BITS');
-        return uint96(n);
-    }
-
     function getPriorVotes(address account, uint256 blockNumber) external view returns (uint96) {
         uint96 option1TotalAllocation = option1[account].allocation;
         uint96 option2TotalAllocation = option2[account].allocation;
 
-        uint96 votes = 0;
+        uint256 votes = 0;
         if (checkpointsLength[account] == 0 || checkpoints[account][0].fromBlock > blockNumber) {
             if (option1[account].initBlock <= blockNumber) {
-                votes = votes.add96(option1TotalAllocation);
+                votes = votes.add(option1TotalAllocation);
             }
             if (option2[account].initBlock <= blockNumber) {
-                votes = votes.add96(option2TotalAllocation);
+                votes = votes.add(option2TotalAllocation);
             }
         } else {
             votes = _getPriorVotes(account, blockNumber);
         }
 
         if (option1StopBlock == option1EndBlock && option2StopBlock == option2EndBlock) {
-            return votes;
+            return votes.toUint96();
         }
         if (option1StopSetBlock > blockNumber && option2StopSetBlock > blockNumber) {
-            return votes;
+            return votes.toUint96();
         }
 
-        uint96 lockedAllocation1;
-        uint96 lockedAllocation2;
+        uint256 lockedAllocation1;
+        uint256 lockedAllocation2;
         if (blockNumber >= option1StopSetBlock) {
             uint256 allocationTime = option1EndBlock.sub(option1StartBlock);
             uint256 haltedTime = option1EndBlock.sub(option1StopBlock);
-            lockedAllocation1 = safe96(uint256(option1TotalAllocation).mul(haltedTime).div(allocationTime));
+            lockedAllocation1 = option1TotalAllocation.mul(haltedTime).div(allocationTime);
         }
         if (blockNumber >= option2StopSetBlock) {
             uint256 allocationTime = option2EndBlock.sub(option2StartBlock);
             uint256 haltedTime = option2EndBlock.sub(option2StopBlock);
-            lockedAllocation2 = safe96(uint256(option2TotalAllocation).mul(haltedTime).div(allocationTime));
+            lockedAllocation2 = option2TotalAllocation.mul(haltedTime).div(allocationTime);
         }
-        return votes.sub96(lockedAllocation1).sub96(lockedAllocation2);
+        return votes.sub(lockedAllocation1).sub(lockedAllocation2).toUint96();
     }
 }

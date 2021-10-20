@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { constants } from 'ethers'
 import { pointsTokenFixture } from '../shared/fixtures'
 import { setupFixtureLoader } from '../shared/setup'
-import { expandTo18Decimals } from '../shared/utilities'
+import { expandTo18Decimals, overrides } from '../shared/utilities'
 
 describe('IntegralPointsToken.mint', () => {
   const loadFixture = setupFixtureLoader()
@@ -14,15 +14,15 @@ describe('IntegralPointsToken.mint', () => {
 
   it('can add minter', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
-    await token.setMinter(other.address, true)
+    await token.setMinter(other.address, true, overrides)
     expect(await token.isMinter(other.address)).to.eq(true)
   })
 
   it('can remove minter', async () => {
     const { token, other } = await loadFixture(pointsTokenFixture)
-    await token.setMinter(other.address, true)
+    await token.setMinter(other.address, true, overrides)
     expect(await token.isMinter(other.address)).to.eq(true)
-    await token.setMinter(other.address, false)
+    await token.setMinter(other.address, false, overrides)
     expect(await token.isMinter(other.address)).to.eq(false)
   })
 
@@ -30,7 +30,7 @@ describe('IntegralPointsToken.mint', () => {
     const { token, wallet } = await loadFixture(pointsTokenFixture)
     const totalSupply = await token.totalSupply()
     const mintedAmount = expandTo18Decimals(1)
-    await token.mint(wallet.address, mintedAmount)
+    await token.mint(wallet.address, mintedAmount, overrides)
     expect(await token.totalSupply()).to.eq(totalSupply.add(mintedAmount))
   })
 
@@ -38,7 +38,7 @@ describe('IntegralPointsToken.mint', () => {
     const { token, wallet } = await loadFixture(pointsTokenFixture)
     const balance = await token.balanceOf(wallet.address)
     const mintedAmount = expandTo18Decimals(1)
-    await token.mint(wallet.address, mintedAmount)
+    await token.mint(wallet.address, mintedAmount, overrides)
     expect(await token.balanceOf(wallet.address)).to.eq(balance.add(mintedAmount))
   })
 
@@ -50,7 +50,7 @@ describe('IntegralPointsToken.mint', () => {
   it('emits event', async () => {
     const { token, wallet } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await expect(token.mint(wallet.address, amount))
+    await expect(token.mint(wallet.address, amount, overrides))
       .to.emit(token, 'Transfer')
       .withArgs(constants.AddressZero, wallet.address, amount)
   })

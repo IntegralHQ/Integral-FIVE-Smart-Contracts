@@ -127,7 +127,7 @@ describe('IntegralDelay.executeBuy', () => {
       })
 
       const amountIn = expandTo18Decimals(200)
-      await token1.transfer(pair.address, amountIn)
+      await token1.transfer(pair.address, amountIn, overrides)
       const amountOut = await pair.getSwapAmount0Out(amountIn)
       await pair.swap(amountOut, 0, wallet.address, overrides)
 
@@ -492,8 +492,8 @@ describe('IntegralDelay.executeBuy', () => {
     const reserve1 = BigNumber.from('27685936267870034790868') // ETH
     const price = BigNumber.from('545609375715524')
 
-    await oracle.setParameters(...getOracleParams('weth-dai', 'DAI'))
-    await oracle.setPrice(price)
+    await oracle.setParameters(...getOracleParams('weth-dai', 'DAI'), overrides)
+    await oracle.setPrice(price, overrides)
     await addLiquidity(reserve0, reserve1)
 
     // tokenIn: eth
@@ -561,7 +561,7 @@ describe('IntegralDelay.executeBuy', () => {
 
       const balanceBefore = await token1.balanceOf(wallet.address)
       const amountOut = expandTo18Decimals(1)
-      const expectedAmountIn = await buyHelper.getSwapAmount1In(pair.address, amountOut)
+      const expectedAmountIn = await buyHelper.getSwapAmount1In(pair.address, amountOut, overrides)
 
       await buyAndWait(delay, token1, token0, wallet, {
         amountOut,
@@ -608,7 +608,7 @@ describe('IntegralDelay.executeBuy', () => {
         gasLimit: 600000,
       })
 
-      await token1.setWasteTransferGas(true)
+      await token1.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
 

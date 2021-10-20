@@ -111,7 +111,7 @@ describe('IntegralOracleV3.updatePrice', () => {
     const { oracle, uniswapV3Pool, provider } = await loadFixture(getV3FixtureFor(6, 18, FeeAmount.MEDIUM, 2100))
     await oracle.setUniswapPair(uniswapV3Pool.address, overrides)
     await provider.send('evm_increaseTime', [TWO_MINUTES])
-    await oracle.setPriceBounds(1, 2)
+    await oracle.setPriceBounds(1, 2, overrides)
     await expect(oracle.updatePrice(overrides)).to.be.revertedWith('IO_PRICE_OUT_OF_BOUNDS')
   })
 })

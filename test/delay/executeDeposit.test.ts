@@ -267,7 +267,7 @@ describe('IntegralDelay.executeDeposit', () => {
     it('price higher than minSwapPrice', async () => {
       const { delay, token0, token1, other, oracle, addLiquidity } = await loadFixture(delayFixture)
 
-      await oracle.setPrice(expandTo18Decimals(10))
+      await oracle.setPrice(expandTo18Decimals(10), overrides)
       await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(200))
       await depositAndWait(delay, token0, token1, other, {
         amount0: expandTo18Decimals(2),
@@ -285,7 +285,7 @@ describe('IntegralDelay.executeDeposit', () => {
     it('price lower than maxSwapPrice', async () => {
       const { delay, token0, token1, other, oracle, addLiquidity } = await loadFixture(delayFixture)
 
-      await oracle.setPrice(expandTo18Decimals(10))
+      await oracle.setPrice(expandTo18Decimals(10), overrides)
       await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(200))
       await depositAndWait(delay, token0, token1, other, {
         gasLimit: 720000,
@@ -430,8 +430,8 @@ describe('IntegralDelay.executeDeposit', () => {
 
   it('deposit for tokens with greater cost requires more gasLimit', async () => {
     const { delay, token0, token1, wallet } = await loadFixture(delayFixture)
-    await delay.setTransferGasCost(token0.address, 200_000)
-    await delay.setTransferGasCost(token1.address, 200_000)
+    await delay.setTransferGasCost(token0.address, 200_000, overrides)
+    await delay.setTransferGasCost(token1.address, 200_000, overrides)
 
     await depositAndWait(delay, token0, token1, wallet)
     const failingTx = await delay.execute(1, { ...overrides, gasPrice: 0 })
@@ -455,7 +455,7 @@ describe('IntegralDelay.executeDeposit', () => {
   it('fails on price lower than minSwapPrice', async () => {
     const { delay, token0, token1, other, oracle, addLiquidity } = await loadFixture(delayFixture)
 
-    await oracle.setPrice(expandTo18Decimals(10))
+    await oracle.setPrice(expandTo18Decimals(10), overrides)
     await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(200))
     await depositAndWait(delay, token0, token1, other, {
       amount0: expandTo18Decimals(2),
@@ -474,7 +474,7 @@ describe('IntegralDelay.executeDeposit', () => {
   it('fails on price higher than maxSwapPrice', async () => {
     const { delay, token0, token1, other, oracle, addLiquidity } = await loadFixture(delayFixture)
 
-    await oracle.setPrice(expandTo18Decimals(10))
+    await oracle.setPrice(expandTo18Decimals(10), overrides)
     await addLiquidity(expandTo18Decimals(200), expandTo18Decimals(200))
     await depositAndWait(delay, token0, token1, other, {
       amount0: expandTo18Decimals(1),
@@ -499,7 +499,7 @@ describe('IntegralDelay.executeDeposit', () => {
       amount1: expandTo18Decimals(1),
     })
 
-    await token0.setWasteTransferGas(true)
+    await token0.setWasteTransferGas(true, overrides)
     const tx = await delay.execute(1, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))
@@ -520,7 +520,7 @@ describe('IntegralDelay.executeDeposit', () => {
       amount1: expandTo18Decimals(1),
     })
 
-    await token1.setWasteTransferGas(true)
+    await token1.setWasteTransferGas(true, overrides)
     const tx = await delay.execute(1, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))
@@ -541,7 +541,7 @@ describe('IntegralDelay.executeDeposit', () => {
       amount1: expandTo18Decimals(1),
     })
 
-    await token0.setWasteTransferGas(true)
+    await token0.setWasteTransferGas(true, overrides)
     const tx = await delay.execute(1, overrides)
     const events = await getEvents(tx, 'OrderExecuted')
     await expect(Promise.resolve(tx))
@@ -613,7 +613,7 @@ describe('IntegralDelay.executeDeposit', () => {
     const decimals0 = await token0.decimals()
     const decimals1 = await token1.decimals()
     await addLiquidity(parseUnits('200', decimals0), parseUnits('200', decimals1))
-    await oracle.setPrice(expandTo18Decimals('0.0002'))
+    await oracle.setPrice(expandTo18Decimals('0.0002'), overrides)
     await depositAndWait(delay, token0, token1, wallet, {
       gasLimit: 650000,
       amount0: parseUnits('2', decimals0),
@@ -632,7 +632,7 @@ describe('IntegralDelay.executeDeposit', () => {
     const decimals0 = await token0.decimals()
     const decimals1 = await token1.decimals()
     await addLiquidity(parseUnits('200', decimals0), parseUnits('200', decimals1))
-    await oracle.setPrice(expandTo18Decimals(10))
+    await oracle.setPrice(expandTo18Decimals(10), overrides)
     await depositAndWait(delay, token0, token1, wallet, {
       gasLimit: 650000,
       amount0: BigNumber.from(0),

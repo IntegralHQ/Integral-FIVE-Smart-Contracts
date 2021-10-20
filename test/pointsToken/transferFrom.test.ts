@@ -18,7 +18,7 @@ describe('IntegralPointsToken.transferFrom', () => {
   it('does not decrease allowance when set for infinity', async () => {
     const { token, wallet, other } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await token.approve(other.address, constants.MaxUint256)
+    await token.approve(other.address, constants.MaxUint256, overrides)
     await token.connect(other).transferFrom(wallet.address, other.address, amount, overrides)
     expect(await token.allowance(wallet.address, other.address)).to.eq(constants.MaxUint256)
   })
@@ -26,7 +26,7 @@ describe('IntegralPointsToken.transferFrom', () => {
   it('does not decrease allowance when sender address is the same as the `from` address', async () => {
     const { token, wallet, other } = await loadFixture(pointsTokenFixture)
     const amount = expandTo18Decimals(1)
-    await token.approve(wallet.address, amount)
+    await token.approve(wallet.address, amount, overrides)
     await token.transferFrom(wallet.address, other.address, amount, overrides)
     expect(await token.allowance(wallet.address, wallet.address)).to.eq(amount)
   })
@@ -37,7 +37,7 @@ describe('IntegralPointsToken.transferFrom', () => {
     const allowance = expandTo18Decimals(2)
     const ownerBalanceBefore = await token.balanceOf(wallet.address)
     const spenderBalanceBefore = await token.balanceOf(other.address)
-    await token.approve(other.address, allowance)
+    await token.approve(other.address, allowance, overrides)
     await token.connect(other).transferFrom(wallet.address, other.address, amount, overrides)
     expect(await token.balanceOf(other.address)).to.eq(spenderBalanceBefore.add(amount))
     expect(await token.balanceOf(wallet.address)).to.eq(ownerBalanceBefore.sub(amount))

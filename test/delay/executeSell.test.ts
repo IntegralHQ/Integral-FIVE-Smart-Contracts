@@ -105,7 +105,7 @@ describe('IntegralDelay.executeSell', () => {
       })
 
       const amountIn = expandTo18Decimals(200)
-      await token0.transfer(pair.address, amountIn)
+      await token0.transfer(pair.address, amountIn, overrides)
       const amountOut = await pair.getSwapAmount1Out(amountIn)
       await pair.swap(0, amountOut, wallet.address, overrides)
 
@@ -212,7 +212,7 @@ describe('IntegralDelay.executeSell', () => {
         gasLimit: 450000,
       })
 
-      await token0.setWasteTransferGas(true)
+      await token0.setWasteTransferGas(true, overrides)
       const tx = await delay.execute(1, overrides)
       const events = await getEvents(tx, 'OrderExecuted')
       await expect(Promise.resolve(tx))

@@ -63,7 +63,7 @@ export async function integralAndUniswapFixture([wallet]: Wallet[]) {
     await (wallet.provider as providers.Web3Provider).send('evm_increaseTime', [1])
     await pair.sync(overrides)
 
-    await oracle.setUniswapPair(pair.address)
+    await oracle.setUniswapPair(pair.address, overrides)
     await (wallet.provider as providers.Web3Provider).send('evm_increaseTime', [SIX_MINUTES])
     await oracle.updatePrice(overrides)
 

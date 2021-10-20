@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { oracleV3Fixture } from '../shared/fixtures'
 import { setupFixtureLoader } from '../shared/setup'
+import { overrides } from '../shared/utilities'
 
 describe('IntegralOracleV3.setPriceBounds', () => {
   const loadFixture = setupFixtureLoader()
@@ -15,7 +16,7 @@ describe('IntegralOracleV3.setPriceBounds', () => {
     const { oracle } = await loadFixture(oracleV3Fixture)
     const minPrice = 200
     const maxPrice = 400
-    await expect(oracle.setPriceBounds(minPrice, maxPrice))
+    await expect(oracle.setPriceBounds(minPrice, maxPrice, overrides))
       .to.emit(oracle, 'PriceBoundsSet')
       .withArgs(minPrice, maxPrice)
     expect(await oracle.minPrice()).to.eq(minPrice)

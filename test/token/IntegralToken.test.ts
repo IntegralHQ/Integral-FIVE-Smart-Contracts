@@ -10,7 +10,7 @@ describe('IntegralToken', () => {
     { property: 'name', value: 'Integral' },
     { property: 'symbol', value: 'ITGR' },
     { property: 'decimals', value: 18 },
-    { property: 'totalSupply', value: expandTo18Decimals(10000) },
+    { property: 'totalSupply', value: expandTo18Decimals(10_000_000_000) },
   ]
 
   testCases.forEach((testCase) => {
@@ -27,7 +27,7 @@ describe('IntegralToken', () => {
 
   it('balance of deployer equals initialAmount', async () => {
     const { token, wallet } = await loadFixture(tokenFixture)
-    expect(await token.balanceOf(wallet.address)).to.eq(expandTo18Decimals(10000))
+    expect(await token.balanceOf(wallet.address)).to.eq(expandTo18Decimals(10_000_000_000))
   })
 
   it('deployer is owner and minter', async () => {

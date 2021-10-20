@@ -32,8 +32,8 @@ describe('IntegralOracle.setParameters', () => {
   it('enforces correct parameter lengths', async () => {
     const { oracle } = await loadFixture(oracleFixture)
 
-    await expect(oracle.setParameters([1], [1, 1], [2, 2], [2, 2])).to.be.revertedWith('IO_LENGTH_MISMATCH')
-    await expect(oracle.setParameters([1], [1], [2], [2, 2])).to.be.revertedWith('IO_LENGTH_MISMATCH')
+    await expect(oracle.setParameters([1], [1, 1], [2, 2], [2, 2], overrides)).to.be.revertedWith('IO_LENGTH_MISMATCH')
+    await expect(oracle.setParameters([1], [1], [2], [2, 2], overrides)).to.be.revertedWith('IO_LENGTH_MISMATCH')
   })
 
   it('increments the epoch', async () => {

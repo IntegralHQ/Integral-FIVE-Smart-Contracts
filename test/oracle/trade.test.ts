@@ -24,7 +24,8 @@ describe('IntegralOracle.trade', () => {
       return oracle.tradeX(
         utils.parseUnits(xAfter.toString(), xDecimals),
         utils.parseUnits(xBefore.toString(), xDecimals),
-        utils.parseUnits(yBefore.toString(), yDecimals)
+        utils.parseUnits(yBefore.toString(), yDecimals),
+        overrides
       )
     }
 
@@ -43,7 +44,8 @@ describe('IntegralOracle.trade', () => {
       return oracle.tradeY(
         utils.parseUnits(yAfter.toString(), yDecimals),
         utils.parseUnits(xBefore.toString(), xDecimals),
-        utils.parseUnits(yBefore.toString(), yDecimals)
+        utils.parseUnits(yBefore.toString(), yDecimals),
+        overrides
       )
     }
 
